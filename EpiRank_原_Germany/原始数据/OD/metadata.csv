@@ -1,0 +1,6 @@
+﻿name;datatype;values;comment;details
+start_county;int;1001 to 16077;Start county ID of trip;
+end_county;int;1001 to 16077;End county ID of trip;
+age_group;int;[1:5];Age group of subpopulation;1: 0-19yrs, 2: 20-49yrs, 3: 50-64yrs, 4: 65-79yrs, 5: 80yrs and above
+activity_dest;int;[1:7];Activity at the destination locatio;1:Work place, 2:Education, 3:Shopping, 4:Leisure/free-time, 5:Personal matters, 6:Other, 7:Home
+trip_cnt;int;[0:n];Aggregated trip count from start_county to end_county with age_group and activity_dest;

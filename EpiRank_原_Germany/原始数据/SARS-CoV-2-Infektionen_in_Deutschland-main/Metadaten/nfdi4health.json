@@ -1,0 +1,227 @@
+{
+  "resource": {
+    "classification": {
+      "type": "Dataset"
+    },
+    "descriptions": [
+      {
+        "language": "DE (German)",
+        "text": "Im Datensatz \"SARS-CoV-2 Infektionen in Deutschland\" des Robert Koch-Instituts werden die Daten basierend auf Meldungen zu SARS-CoV-2 Infektionen nach dem Infektionsschutzgesetz (IfSG) bereitgestellt. Darin enthalten sind Informationen auf Landkreisebene zu bestätigten Infektionen, Todesfällen und Genesungen, differenziert nach Altersgruppen und Geschlecht. Diese Daten dienen als Grundlage für epidemiologische Bewertungen und gesundheitspolitische Maßnahmen."
+      }
+    ],
+    "titles": [
+      {
+        "language": "DE (German)",
+        "text": "SARS-CoV-2 Infektionen in Deutschland"
+      }
+    ],
+    "ids": [
+      {
+        "identifier": "10.5281/zenodo.22719679",
+        "typeGeneral": "Dataset",
+        "relationType": "A references B",
+        "scheme": "DOI"
+      },
+      {
+        "identifier": "https://github.com/robert-koch-institut/SARS-CoV-2-Infektionen_in_Deutschland",
+        "typeGeneral": "Dataset",
+        "relationType": "A references B",
+        "scheme": "URL"
+      }
+    ],
+    "provenance": {
+      "dataSource": "Automatically uploaded: Other"
+    },
+    "keywords": [
+      {
+        "label": "COVID-19",
+        "code": "http://id.nlm.nih.gov/mesh/D000086382"
+      },
+      {
+        "label": "SARS-CoV-2",
+        "code": "http://id.nlm.nih.gov/mesh/D000086402"
+      },
+      {
+        "label": "Infektionen",
+        "code": "http://id.nlm.nih.gov/mesh/D007239"
+      },
+      {
+        "label": "Deutschland",
+        "code": "http://id.nlm.nih.gov/mesh/D005858"
+      },
+      {
+        "label": "Infections",
+        "code": "http://id.nlm.nih.gov/mesh/D007239"
+      },
+      {
+        "label": "Open Data"
+      },
+      {
+        "label": "Offene Daten"
+      },
+      {
+        "label": "SurvNet"
+      },
+      {
+        "label": "Germany",
+        "code": "http://id.nlm.nih.gov/mesh/D005858"
+      },
+      {
+        "label": "RKI"
+      },
+      {
+        "label": "Gesundheitsberichterstattung",
+        "code": "http://id.nlm.nih.gov/mesh/D062486"
+      },
+      {
+        "label": "Epidemiologie",
+        "code": "http://id.nlm.nih.gov/mesh/D004813"
+      },
+      {
+        "label": "Public health surveillance",
+        "code": "http://id.nlm.nih.gov/mesh/D062486"
+      },
+      {
+        "label": "Epidemiology",
+        "code": "http://id.nlm.nih.gov/mesh/D004813"
+      }
+    ],
+    "languages": [
+      "DE (German)"
+    ],
+    "nonStudyDetails": {
+      "useRights": {
+        "confirmations": {
+          "authority": true,
+          "irrevocability": true,
+          "terms": true,
+          "supportByLicensing": true
+        },
+        "label": "CC BY 4.0 (Creative Commons Attribution 4.0 International)"
+      },
+      "version": "2026-09-12"
+    },
+    "webpage": "https://robert-koch-institut.github.io/SARS-CoV-2-Infektionen_in_Deutschland",
+    "contributors": [
+      {
+        "nameType": "Organisational",
+        "affiliations": [
+          {
+            "name": "Robert Koch-Institut",
+            "identifiers": [
+              {
+                "identifier": "01k5qnb77",
+                "scheme": "ROR"
+              }
+            ]
+          }
+        ],
+        "organisational": {
+          "name": "Robert Koch-Institut",
+          "type": "Creator/Author"
+        }
+      },
+      {
+        "nameType": "Personal",
+        "affiliations": [
+          {
+            "name": "Robert Koch-Institut",
+            "identifiers": [
+              {
+                "identifier": "01k5qnb77",
+                "scheme": "ROR"
+              }
+            ]
+          }
+        ],
+        "personal": {
+          "type": "Project manager",
+          "givenName": "Michaela",
+          "familyName": "Diercke",
+          "identifiers": [
+            {
+              "identifier": "0000-0002-4678-1813",
+              "scheme": "ORCID"
+            }
+          ]
+        }
+      },
+      {
+        "nameType": "Personal",
+        "affiliations": [
+          {
+            "name": "Robert Koch-Institut",
+            "identifiers": [
+              {
+                "identifier": "01k5qnb77",
+                "scheme": "ROR"
+              }
+            ]
+          }
+        ],
+        "personal": {
+          "type": "Project manager",
+          "givenName": "Linus",
+          "familyName": "Grabenhenrich",
+          "identifiers": [
+            {
+              "identifier": "0000-0002-9300-6625",
+              "scheme": "ORCID"
+            }
+          ]
+        }
+      },
+      {
+        "nameType": "Personal",
+        "affiliations": [
+          {
+            "name": "Robert Koch-Institut",
+            "identifiers": [
+              {
+                "identifier": "01k5qnb77",
+                "scheme": "ROR"
+              }
+            ]
+          }
+        ],
+        "personal": {
+          "type": "Project manager",
+          "givenName": "Hermann",
+          "familyName": "Claus",
+          "identifiers": [
+            {
+              "identifier": "0000-0002-0120-1846",
+              "scheme": "ORCID"
+            }
+          ]
+        }
+      },
+      {
+        "nameType": "Personal",
+        "affiliations": [
+          {
+            "name": "Robert Koch-Institut",
+            "identifiers": [
+              {
+                "identifier": "01k5qnb77",
+                "scheme": "ROR"
+              }
+            ]
+          }
+        ],
+        "personal": {
+          "type": "Data curator",
+          "givenName": "Hannes",
+          "familyName": "Wünsche",
+          "identifiers": [
+            {
+              "identifier": "0000-0002-8837-0326",
+              "scheme": "ORCID"
+            }
+          ]
+        }
+      }
+    ],
+    "identifier": "1288"
+  }
+}

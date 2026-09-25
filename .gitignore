@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+*$py.class
+# 第三方数据集的 LFS 大文件本地只有指针、无真实数据，暂不上传
+EpiRank_原_Germany/原始数据/SARS-CoV-2-Infektionen_in_Deutschland-main/Aktuell_Deutschland_SarsCov2_Infektionen.csv

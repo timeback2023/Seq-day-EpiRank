@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+type: dataset
+title: SARS-CoV-2 Infektionen in Deutschland
+abstract: Im Datensatz "SARS-CoV-2 Infektionen in Deutschland" des Robert Koch-Instituts
+  werden die Daten basierend auf Meldungen zu SARS-CoV-2 Infektionen nach dem Infektionsschutzgesetz
+  (IfSG) bereitgestellt. Darin enthalten sind Informationen auf Landkreisebene zu
+  bestätigten Infektionen, Todesfällen und Genesungen, differenziert nach Altersgruppen
+  und Geschlecht. Diese Daten dienen als Grundlage für epidemiologische Bewertungen
+  und gesundheitspolitische Maßnahmen.
+date-released: '2026-09-12'
+keywords:
+  - COVID-19
+  - SARS-CoV-2
+  - Infektionen
+  - Deutschland
+  - Infections
+  - Open Data
+  - Offene Daten
+  - SurvNet
+  - Germany
+  - RKI
+  - Gesundheitsberichterstattung
+  - Epidemiologie
+  - Public health surveillance
+  - Epidemiology
+message: Cite me!
+url: https://robert-koch-institut.github.io/SARS-CoV-2-Infektionen_in_Deutschland
+license: CC-BY-4.0
+doi: 10.5281/zenodo.22719679
+version: '2026-09-12T07:02:48+02:00'
+authors:
+  - name: Robert Koch-Institut
+    email: info@rki.de
+    website: https://www.rki.de/
