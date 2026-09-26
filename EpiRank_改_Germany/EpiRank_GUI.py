@@ -103,7 +103,7 @@ KEY_IN_COMMUTER_TYPE1    = 'in_commuter_type1'
 KEY_COMMUTER_TYPE1       = 'commuter_type1'
 KEY_RAILROAD_ZONE        = 'railroad_zone'
 KEY_FLU_TOTAL_CASES      = 'flu_total_cases'
-KEY_EV_AVERAGE_CASES     = 'EV_average_cases'
+KEY_NV_TOTAL_CASES       = 'NV_total_cases'
 KEY_COVID_TOTAL_CASES     = 'covid_total_cases'
 
 
@@ -193,9 +193,9 @@ def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet=None,
     wb.close()
 
 
-def build_ev_reported_cases(town_data, path='ev.xlsx', sheet=None,
+def build_nv_reported_cases(town_data, path='nv.xlsx', sheet=None,
                              number_of_towns=400, row_base=2):
-    """载入肠病毒平均病例数。"""
+    """载入诺如病毒病例数。"""
     wb = load_workbook(path, data_only=True)
     s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     check_list = {}
@@ -209,7 +209,7 @@ def build_ev_reported_cases(town_data, path='ev.xlsx', sheet=None,
         db_ID = check_list.get((county, town_name), None)
         if db_ID is not None:
             raw = s.cell(row=r, column=3).value
-            town_data[db_ID][KEY_EV_AVERAGE_CASES] = float(raw) if raw is not None else 0.0
+            town_data[db_ID][KEY_NV_TOTAL_CASES] = int(raw) if raw is not None else 0
     wb.close()
 
 
@@ -651,8 +651,8 @@ class ComputeWorker(QThread):
             self.log_message.emit("Loading Flu reported cases (Flu.xlsx)...")
             build_flu_reported_cases(town_data)
 
-            self.log_message.emit("Loading Enterovirus reported cases (ev.xlsx)...")
-            build_ev_reported_cases(town_data)
+            self.log_message.emit("Loading Norovirus reported cases (nv.xlsx)...")
+            build_nv_reported_cases(town_data)
 
             self.log_message.emit("Loading COVID-19 reported cases (COVID-19.xlsx)...")
             build_covid_reported_cases(town_data)
@@ -694,7 +694,7 @@ class ComputeWorker(QThread):
             ER_rank = {seq_no: float(epidemic_risk[i, 0]) for i, seq_no in enumerate(nodes)}
             pop_rank = {seq_no: town_data[g.nodes[seq_no][KEY_DB_ID]][KEY_POPULATION] for seq_no in nodes}
             flu_case_rank = {seq_no: town_data[g.nodes[seq_no][KEY_DB_ID]].get(KEY_FLU_TOTAL_CASES, 0) for seq_no in nodes}
-            ev_case_rank = {seq_no: town_data[g.nodes[seq_no][KEY_DB_ID]].get(KEY_EV_AVERAGE_CASES, 0) for seq_no in nodes}
+            nv_case_rank = {seq_no: town_data[g.nodes[seq_no][KEY_DB_ID]].get(KEY_NV_TOTAL_CASES, 0) for seq_no in nodes}
             covid_case_rank = {seq_no: town_data[g.nodes[seq_no][KEY_DB_ID]].get(KEY_COVID_TOTAL_CASES, 0) for seq_no in nodes}
 
             er_values = np.array(list(ER_rank.values()))
@@ -739,7 +739,7 @@ class ComputeWorker(QThread):
             # 疾病数据
             disease_dicts = [
                 ('Flu', flu_case_rank),
-                ('EV', ev_case_rank),
+                ('NV', nv_case_rank),
                 ('COVID-19', covid_case_rank),
             ]
 
@@ -784,7 +784,7 @@ class ComputeWorker(QThread):
                     'hub': round(hub_rank.get(seq_no, 0), 8),
                     'authority': round(authority_rank.get(seq_no, 0), 8),
                     'flu_cases': td.get(KEY_FLU_TOTAL_CASES, 0),
-                    'ev_cases': td.get(KEY_EV_AVERAGE_CASES, 0),
+                    'nv_cases': td.get(KEY_NV_TOTAL_CASES, 0),
                     'covid_cases': td.get(KEY_COVID_TOTAL_CASES, 0),
                     'pos_x': td[KEY_POS_XY][0],
                     'pos_y': td[KEY_POS_XY][1],
@@ -804,7 +804,7 @@ class ComputeWorker(QThread):
                 'hub_rank': hub_rank,
                 'authority_rank': authority_rank,
                 'flu_case_rank': flu_case_rank,
-                'ev_case_rank': ev_case_rank,
+                'nv_case_rank': nv_case_rank,
                 'covid_case_rank': covid_case_rank,
                 'pop_rank': pop_rank,
                 'iterations': iterations,
@@ -851,20 +851,20 @@ class SensitivityWorker(QThread):
             g = nx.DiGraph()
             build_basic_table_of_towns(town_data)
             build_flu_reported_cases(town_data)
-            build_ev_reported_cases(town_data)
+            build_nv_reported_cases(town_data)
             build_commuting_network(g, town_data)
 
             nodes = list(g.nodes())
             flu_case_rank = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_FLU_TOTAL_CASES, 0) for s in nodes}
-            ev_case_rank  = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_EV_AVERAGE_CASES, 0) for s in nodes}
+            nv_case_rank  = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_NV_TOTAL_CASES, 0) for s in nodes}
 
             d_values = np.round(np.arange(0.05, 1.025, 0.05), 2)
             total = len(d_values)
 
             flu_pearson  = np.zeros(len(d_values))
             flu_spearman = np.zeros(len(d_values))
-            ev_pearson   = np.zeros(len(d_values))
-            ev_spearman  = np.zeros(len(d_values))
+            nv_pearson   = np.zeros(len(d_values))
+            nv_spearman  = np.zeros(len(d_values))
 
             for j, dv in enumerate(d_values):
                 er, iters, _, _, _ = compute_epidemic_risk(
@@ -875,13 +875,13 @@ class SensitivityWorker(QThread):
 
                 fp_r, _ = get_pearson_cor(er_rank, flu_case_rank)
                 fs_r, _ = get_spearman_cor(er_rank, flu_case_rank)
-                ep_r, _ = get_pearson_cor(er_rank, ev_case_rank)
-                es_r, _ = get_spearman_cor(er_rank, ev_case_rank)
+                ep_r, _ = get_pearson_cor(er_rank, nv_case_rank)
+                es_r, _ = get_spearman_cor(er_rank, nv_case_rank)
 
                 flu_pearson[j]  = fp_r
                 flu_spearman[j] = fs_r
-                ev_pearson[j]   = ep_r
-                ev_spearman[j]  = es_r
+                nv_pearson[j]   = ep_r
+                nv_spearman[j]  = es_r
 
                 self.progress.emit(j + 1, total)
                 self.log_message.emit(f"  d={dv:.2f} completed ({j+1}/{total})")
@@ -890,8 +890,8 @@ class SensitivityWorker(QThread):
             self.finished_ok.emit({
                 'flu_pearson': flu_pearson,
                 'flu_spearman': flu_spearman,
-                'ev_pearson': ev_pearson,
-                'ev_spearman': ev_spearman,
+                'nv_pearson': nv_pearson,
+                'nv_spearman': nv_spearman,
                 'd_values': d_values,
             })
 
@@ -1190,7 +1190,7 @@ class EpiRankMainWindow(QMainWindow):
         self.log_text.append(msg)
 
     def _run_computation(self):
-        required = ['bs.xlsx', 'Flu.xlsx', 'ev.xlsx', 'COVID-19.xlsx', 'cn.xlsx']
+        required = ['bs.xlsx', 'Flu.xlsx', 'nv.xlsx', 'COVID-19.xlsx', 'cn.xlsx']
         missing = [f for f in required if not os.path.isfile(os.path.join(self.data_dir, f))]
         if missing:
             QMessageBox.warning(self, "Missing Data Files",
@@ -1282,7 +1282,7 @@ class EpiRankMainWindow(QMainWindow):
                     'Population', 'Area', 'Density',
                     'C.local', 'C.out', 'C.in',
                     'PageRank', 'Hub', 'Authority',
-                    'Flu Cases', 'EV Cases', 'COVID-19 Cases']
+                    'Flu Cases', 'NV Cases', 'COVID-19 Cases']
 
         self.table.setRowCount(len(data))
         self.table.setColumnCount(len(headers))
@@ -1310,7 +1310,7 @@ class EpiRankMainWindow(QMainWindow):
                 f"{item['population']:.0f}", item['area'], item['density'],
                 item['C_local'], item['C_out'], item['C_in'],
                 f"{item['page_rank']:.8f}", f"{item['hub']:.8f}", f"{item['authority']:.8f}",
-                item['flu_cases'], item['ev_cases'], item['covid_cases']
+                item['flu_cases'], item['nv_cases'], item['covid_cases']
             ]
             for col, val in enumerate(values):
                 cell = QTableWidgetItem(str(val))
@@ -1546,7 +1546,7 @@ class EpiRankMainWindow(QMainWindow):
 
         flu_cases = np.array([town_data[db].get(KEY_FLU_TOTAL_CASES, 0)
                               for db in db_ids], dtype=float)
-        ev_cases  = np.array([town_data[db].get(KEY_EV_AVERAGE_CASES, 0.0)
+        nv_cases  = np.array([town_data[db].get(KEY_NV_TOTAL_CASES, 0.0)
                               for db in db_ids], dtype=float)
 
         local_flows_arr = np.array(
@@ -1565,9 +1565,9 @@ class EpiRankMainWindow(QMainWindow):
                 log_ratios[i] = np.log10(inter_in[i] / inter_out[i])
 
         flu_breaks = head_tail_breaks(flu_cases, 3)
-        ev_breaks  = head_tail_breaks(ev_cases, 3)
+        nv_breaks  = head_tail_breaks(nv_cases, 3)
         flu_levels = classify_by_breaks(flu_cases, flu_breaks)
-        ev_levels  = classify_by_breaks(ev_cases, ev_breaks)
+        nv_levels  = classify_by_breaks(nv_cases, nv_breaks)
 
         def draw_freq_dist(ax, case_values, breaks, levels, title,
                            xlabel='epidemic risk'):
@@ -1647,16 +1647,16 @@ class EpiRankMainWindow(QMainWindow):
                        '(a) frequency distribution of flu cases')
 
         ax_b = self.fig_disease.add_subplot(gs[0, 1])
-        draw_freq_dist(ax_b, ev_cases, ev_breaks, ev_levels,
-                       '(b) frequency distribution of EV cases')
+        draw_freq_dist(ax_b, nv_cases, nv_breaks, nv_levels,
+                       '(b) frequency distribution of NV cases')
 
         ax_c = self.fig_disease.add_subplot(gs[1, 0])
         draw_inout_ratio(ax_c, log_ratios, flu_levels,
                          '(c) in/out ratio of flu cases')
 
         ax_d = self.fig_disease.add_subplot(gs[1, 1])
-        draw_inout_ratio(ax_d, log_ratios, ev_levels,
-                         '(d) in/out ratio of EV cases')
+        draw_inout_ratio(ax_d, log_ratios, nv_levels,
+                         '(d) in/out ratio of NV cases')
 
         self.canvas_disease.draw()
 
@@ -1791,13 +1791,13 @@ class EpiRankMainWindow(QMainWindow):
 
         flu_cases = np.array([town_data[db].get(KEY_FLU_TOTAL_CASES, 0)
                               for db in db_ids], dtype=float)
-        ev_cases = np.array([town_data[db].get(KEY_EV_AVERAGE_CASES, 0.0)
+        nv_cases = np.array([town_data[db].get(KEY_NV_TOTAL_CASES, 0.0)
                              for db in db_ids], dtype=float)
 
         flu_breaks = head_tail_breaks(flu_cases, 3)
-        ev_breaks = head_tail_breaks(ev_cases, 3)
+        nv_breaks = head_tail_breaks(nv_cases, 3)
         flu_actual = classify_by_breaks(flu_cases, flu_breaks)
-        ev_actual = classify_by_breaks(ev_cases, ev_breaks)
+        nv_actual = classify_by_breaks(nv_cases, nv_breaks)
 
         X_LEVELS = ['core-I', 'core-II', 'core-III', 'non-core']
         LEVEL_TO_X = {'C-I': 'core-I', 'C-II': 'core-II',
@@ -1861,7 +1861,7 @@ class EpiRankMainWindow(QMainWindow):
         draw_comparison(ax_a, flu_actual, er_levels, '(a) flu case')
 
         ax_b = self.fig_epirank_vs.add_subplot(gs[0, 1])
-        draw_comparison(ax_b, ev_actual, er_levels, '(b) EV case')
+        draw_comparison(ax_b, nv_actual, er_levels, '(b) NV case')
 
         legend_patches = [
             Patch(facecolor=PREDICTED_COLORS[lv], label=lv)
@@ -1955,7 +1955,7 @@ class EpiRankMainWindow(QMainWindow):
 
         diseases = [
             ('Flu',     core_labels.get('Flu', {})),
-            ('EV',      core_labels.get('EV', {})),
+            ('NV',      core_labels.get('NV', {})),
             ('COVID-19', core_labels.get('COVID-19', {})),
         ]
 
@@ -2117,7 +2117,7 @@ class EpiRankMainWindow(QMainWindow):
 
         disease_info = [
             ('(a) flu case distribution', self.results['flu_case_rank']),
-            ('(b) EV case distribution', self.results['ev_case_rank']),
+            ('(b) NV case distribution', self.results['nv_case_rank']),
         ]
         size_map = {'C-I': 120, 'C-II': 60, 'C-III': 30, 'NC': 10}
         legend_labels = {'NC': 'non-core', 'C-III': 'core-III',
@@ -2237,7 +2237,7 @@ class EpiRankMainWindow(QMainWindow):
 
         disease_info = [
             ('(a) flu cases', self.results['flu_case_rank']),
-            ('(b) EV cases', self.results['ev_case_rank']),
+            ('(b) NV cases', self.results['nv_case_rank']),
         ]
 
         from matplotlib.lines import Line2D
@@ -2658,7 +2658,7 @@ class EpiRankMainWindow(QMainWindow):
 
         返回结构：
             { 'EpiRank': {'0': {'level': 'C-I', 'score': ..., 'county': ..., 'town': ...}, ...},
-              'PageRank': {...}, ..., 'Flu': {...}, 'EV': {...}, 'COVID-19': {...} }
+              'PageRank': {...}, ..., 'Flu': {...}, 'NV': {...}, 'COVID-19': {...} }
         键为 str(db_ID)，与其它版本保持一致。
         """
         r = self.results
@@ -2673,7 +2673,7 @@ class EpiRankMainWindow(QMainWindow):
             'HITS-Authority': r['authority_rank'],
             'Population':     r['pop_rank'],
             'Flu':            r['flu_case_rank'],
-            'EV':             r['ev_case_rank'],
+            'NV':             r['nv_case_rank'],
             'COVID-19':       r['covid_case_rank'],   # 德国版疾病键
         }
 
@@ -2776,7 +2776,7 @@ class EpiRankMainWindow(QMainWindow):
                     'ERV', 'ERP (%)',
                     'C.local', 'C.out', 'C.in', 'C.out-towns', 'C.in-towns',
                     'R.zone', 'page rank', 'hits.hub', 'hits.authority',
-                    'flu cases', 'ev cases', 'covid cases']
+                    'flu cases', 'nv cases', 'covid cases']
         for j, h in enumerate(headers):
             cell = ws.cell(row=1, column=j + 2, value=h)
             cell.font = title_font
@@ -2824,7 +2824,7 @@ class EpiRankMainWindow(QMainWindow):
                 round(r['hub_rank'].get(seq_no, 0), 6),
                 round(r['authority_rank'].get(seq_no, 0), 6),
                 td.get(KEY_FLU_TOTAL_CASES, 0),
-                td.get(KEY_EV_AVERAGE_CASES, 0),
+                td.get(KEY_NV_TOTAL_CASES, 0),
                 td.get(KEY_COVID_TOTAL_CASES, 0),
             ]
             for j, v in enumerate(vals):
@@ -2852,7 +2852,7 @@ class EpiRankMainWindow(QMainWindow):
         ER_rank = r['ER_rank']
         pop_rank = r['pop_rank']
         flu_case_rank = r['flu_case_rank']
-        ev_case_rank = r['ev_case_rank']
+        nv_case_rank = r['nv_case_rank']
         covid_case_rank = r['covid_case_rank']
         page_rank = r['page_rank']
         hub_rank = r['hub_rank']
@@ -2880,43 +2880,43 @@ class EpiRankMainWindow(QMainWindow):
         ws.cell(row=sr + 2, column=16, value=round(ER_std, 5)).font = body_font
 
         labels = [
-            'pearson  (*,  EV)', 'spearman (*,  EV)',
+            'pearson  (*,  NV)', 'spearman (*,  NV)',
             'pearson  (*, Flu)', 'spearman (*, Flu)',
             'pearson  (*, COVID-19)', 'spearman (*, COVID-19)',
         ]
         for i, lbl in enumerate(labels):
             ws.cell(row=sr + i, column=23, value=lbl).font = body_font
 
-        ws.cell(row=sr, column=24, value=get_pearson_cor(page_rank, ev_case_rank)).font = body_font
-        ws.cell(row=sr + 1, column=24, value=get_spearman_cor(page_rank, ev_case_rank)).font = body_font
+        ws.cell(row=sr, column=24, value=get_pearson_cor(page_rank, nv_case_rank)).font = body_font
+        ws.cell(row=sr + 1, column=24, value=get_spearman_cor(page_rank, nv_case_rank)).font = body_font
         ws.cell(row=sr + 2, column=24, value=get_pearson_cor(page_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 3, column=24, value=get_spearman_cor(page_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 4, column=24, value=get_pearson_cor(page_rank, covid_case_rank)).font = body_font
         ws.cell(row=sr + 5, column=24, value=get_spearman_cor(page_rank, covid_case_rank)).font = body_font
 
-        ws.cell(row=sr, column=25, value=get_pearson_cor(hub_rank, ev_case_rank)).font = body_font
-        ws.cell(row=sr + 1, column=25, value=get_spearman_cor(hub_rank, ev_case_rank)).font = body_font
+        ws.cell(row=sr, column=25, value=get_pearson_cor(hub_rank, nv_case_rank)).font = body_font
+        ws.cell(row=sr + 1, column=25, value=get_spearman_cor(hub_rank, nv_case_rank)).font = body_font
         ws.cell(row=sr + 2, column=25, value=get_pearson_cor(hub_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 3, column=25, value=get_spearman_cor(hub_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 4, column=25, value=get_pearson_cor(hub_rank, covid_case_rank)).font = body_font
         ws.cell(row=sr + 5, column=25, value=get_spearman_cor(hub_rank, covid_case_rank)).font = body_font
 
-        ws.cell(row=sr, column=26, value=get_pearson_cor(authority_rank, ev_case_rank)).font = body_font
-        ws.cell(row=sr + 1, column=26, value=get_spearman_cor(authority_rank, ev_case_rank)).font = body_font
+        ws.cell(row=sr, column=26, value=get_pearson_cor(authority_rank, nv_case_rank)).font = body_font
+        ws.cell(row=sr + 1, column=26, value=get_spearman_cor(authority_rank, nv_case_rank)).font = body_font
         ws.cell(row=sr + 2, column=26, value=get_pearson_cor(authority_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 3, column=26, value=get_spearman_cor(authority_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 4, column=26, value=get_pearson_cor(authority_rank, covid_case_rank)).font = body_font
         ws.cell(row=sr + 5, column=26, value=get_spearman_cor(authority_rank, covid_case_rank)).font = body_font
 
-        ws.cell(row=sr, column=28, value=get_pearson_cor(ER_rank, ev_case_rank)).font = body_font
-        ws.cell(row=sr + 1, column=28, value=get_spearman_cor(ER_rank, ev_case_rank)).font = body_font
+        ws.cell(row=sr, column=28, value=get_pearson_cor(ER_rank, nv_case_rank)).font = body_font
+        ws.cell(row=sr + 1, column=28, value=get_spearman_cor(ER_rank, nv_case_rank)).font = body_font
         ws.cell(row=sr + 2, column=27, value=get_pearson_cor(ER_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 3, column=27, value=get_spearman_cor(ER_rank, flu_case_rank)).font = body_font
         ws.cell(row=sr + 4, column=29, value=get_pearson_cor(ER_rank, covid_case_rank)).font = body_font
         ws.cell(row=sr + 5, column=29, value=get_spearman_cor(ER_rank, covid_case_rank)).font = body_font
 
         for c, lbl in [(24, 'page rank'), (25, 'hits.hub'), (26, 'hits.authority'),
-                         (27, 'flu cases'), (28, 'ev cases'), (29, 'covid cases')]:
+                         (27, 'flu cases'), (28, 'nv cases'), (29, 'covid cases')]:
             ws.cell(row=sr + 6, column=c, value=lbl).font = title_font
 
         # ── 新增 Evaluation Summary 工作表 ──
@@ -2998,8 +2998,8 @@ class EpiRankMainWindow(QMainWindow):
         matrices = [
             ("(a) flu (Pearson's R)", sr['flu_pearson']),
             ("(b) flu (Spearman's Rho)", sr['flu_spearman']),
-            ("(c) EV (Pearson's R)", sr['ev_pearson']),
-            ("(d) EV (Spearman's Rho)", sr['ev_spearman']),
+            ("(c) NV (Pearson's R)", sr['nv_pearson']),
+            ("(d) NV (Spearman's Rho)", sr['nv_spearman']),
         ]
 
         for idx, (title, values) in enumerate(matrices):
