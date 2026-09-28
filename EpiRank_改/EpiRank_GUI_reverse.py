@@ -581,6 +581,232 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
 
 
 # ============================================================
+# M1 / M2 指标日志格式化
+# ============================================================
+#
+# transient_metrics / attribution_data 内含 400 维向量与 400×400 矩阵，
+# 直接整份打印会淹没 Log 页。此处对每项输出：
+#   (1) 统计摘要（n / finite / min / p50 / mean / max）
+#   (2) Top-N 排名表（自动跳过 inf/nan）
+#   (3) 矩阵则额外列出权重最大的 N 条边
+# N 由 LOG_TOP_N 控制。
+# ============================================================
+
+LOG_TOP_N = 10        # 各类排名表输出条数
+LOG_TRAJ_FULL = 20    # 轨迹逐轮表：轮数 <= 此值时全部输出，否则只给首尾各 5 轮
+
+
+def _node_name(g, town_data, node):
+    """节点标签：'town [db_ID]'。"""
+    db_ID = g.nodes[node][KEY_DB_ID]
+    td = town_data[db_ID]
+    return f"{td[KEY_TOWN] or td[KEY_COUNTY]} [db {db_ID}]"
+
+
+def _stat_line(name, values):
+    """一行统计摘要；inf/nan 不参与统计但会计数。"""
+    a = np.asarray(values, dtype=float).ravel()
+    finite = a[np.isfinite(a)]
+    if finite.size == 0:
+        return f"    {name:<26} n={a.size:<5} (no finite value)"
+    return (f"    {name:<26} n={a.size:<5} finite={finite.size:<5} "
+            f"min={finite.min():.6g}  p50={np.median(finite):.6g}  "
+            f"mean={finite.mean():.6g}  max={finite.max():.6g}")
+
+
+def _append_rank_table(lines, title, nodes, g, town_data, values,
+                       largest=True, top_n=LOG_TOP_N, fmt='{:+.6g}'):
+    """输出一个 Top-N 排名表（自动跳过 inf/nan）。"""
+    a = np.asarray(values, dtype=float).ravel()
+    lines.append(title)
+    order = np.argsort(-a if largest else a, kind='stable')
+    shown = 0
+    for idx in order:
+        if not np.isfinite(a[idx]):
+            continue
+        shown += 1
+        lines.append(f"      #{shown:<3d} node={str(nodes[idx]):<6s} "
+                     f"{fmt.format(a[idx]):>15s}  "
+                     f"{_node_name(g, town_data, nodes[idx])}")
+        if shown >= top_n:
+            break
+    if shown == 0:
+        lines.append('      (no finite value)')
+    lines.append('')
+
+
+def _append_matrix_edges(lines, name, M, nodes, g, town_data, top_n=LOG_TOP_N):
+    """输出一个风险流矩阵的摘要与权重最大的 top_n 条边。
+
+    方向约定：矩阵以「列 = 风险流出方（来源）」存储，即 M[i, j] 表示风险
+    由 j 流向 i，故边写作 nodes[j] -> nodes[i]。
+
+    对角线 F[i, i] 是本地留存的风险，会随迭代单调累积而压过所有跨乡镇边，
+    故摘要与排名皆在置零对角线后的矩阵上进行。
+    """
+    a = np.asarray(M, dtype=float)
+    off = a.copy()
+    np.fill_diagonal(off, 0.0)
+    lines.append(f'    {name}: shape={off.shape}  nnz={int((off > 0).sum())}  '
+                 f'sum={off.sum():.6g}  min={off.min():.6g}  '
+                 f'max={off.max():.6g}  (diagonal excluded)')
+    flat = off.ravel()
+    if flat.size == 0 or flat.max() <= 0:
+        lines.append('      (no positive edge)')
+        lines.append('')
+        return
+    k = min(top_n, flat.size)
+    idx = np.argpartition(-flat, k - 1)[:k]
+    idx = idx[np.argsort(-flat[idx])]
+    n_rows = a.shape[0]
+    lines.append(f'      top {k} edges (src -> dst):')
+    for rank, fi in enumerate(idx, 1):
+        i, j = divmod(int(fi), n_rows)
+        lines.append(f"        #{rank:<3d} {str(nodes[j]):>5s} -> {str(nodes[i]):<5s} "
+                     f"{flat[fi]:>15.6g}   "
+                     f"{_node_name(g, town_data, nodes[j])} -> "
+                     f"{_node_name(g, town_data, nodes[i])}")
+    lines.append('')
+
+
+def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
+                     top_n=LOG_TOP_N):
+    """把 M1（瞬态动力学）与 M2（方向性归因）指标编排为可读文本。
+
+    nodes 必须与 compute_epidemic_risk() 中矩阵的行/列顺序一致
+    （即 list(g.nodes())），否则节点名与数值会错位。
+    """
+    lines = ['=' * 78,
+             'M1 / M2 指标明细',
+             '=' * 78, '']
+
+    # ── M1: 瞬态动力学 ──
+    if transient_metrics is None:
+        lines.append('[M1] 未记录瞬态轨迹 (record_trajectory=False)')
+    else:
+        tm = transient_metrics
+        traj = tm['trajectory']
+        T, N = traj.shape
+        lines.append(f'[M1] 瞬态动力学  T={T} iterations, N={N} nodes')
+        lines.append('')
+
+        lines.append('  谱性质')
+        lines.append(_stat_line('lambda1', [tm['lambda1']]))
+        lines.append(_stat_line('lambda2', [tm['lambda2']]))
+        lines.append(f"    {'spectral_gap':<26} {tm['spectral_gap']:.6g}")
+        kem = tm['kemeny_constant']
+        lines.append(f"    {'kemeny_constant':<26} "
+                     f"{'inf' if not np.isfinite(kem) else format(kem, '.6g')}")
+        lines.append('')
+
+        # 轨迹
+        lines.append(f'  轨迹 trajectory  shape={traj.shape}')
+        lines.append(f"    {'t=0 sum':<26} {traj[0].sum():.10f}")
+        lines.append(f"    {'t=T-1 sum':<26} {traj[-1].sum():.10f}")
+        er_star = np.asarray(tm['er_star'], dtype=float)
+        dev = np.abs(traj[-1] - er_star)
+        lines.append(f"    {'max|traj[-1]-ER*|':<26} {dev.max():.6g}")
+        if T <= LOG_TRAJ_FULL:
+            rows = list(range(T))
+        else:
+            rows = list(range(5)) + [None] + list(range(T - 5, T))
+        lines.append('    per-iteration  mean / min / max:')
+        for t in rows:
+            if t is None:
+                lines.append('      ...')
+                continue
+            col = traj[t]
+            lines.append(f"      t={t:<5d} mean={col.mean():.6e}  "
+                         f"min={col.min():.6e}  max={col.max():.6e}")
+        if T > LOG_TRAJ_FULL:
+            lines.append(f'      (only first/last 5 of {T} iterations shown)')
+        lines.append('')
+
+        # 到达时间
+        at = np.asarray(tm['arrival_time'], dtype=float)
+        lines.append('  到达时间 arrival_time  (首次满足 ER_t >= 0.5 * ER* 的迭代号)')
+        lines.append(_stat_line('arrival_time', at))
+        lines.append(f"    {'never reached (inf)':<26} {int(np.isinf(at).sum())}")
+        _append_rank_table(lines, f'  最快到达 top {top_n} (arrival_time 最小):',
+                           nodes, g, town_data, at, largest=False,
+                           top_n=top_n, fmt='{:.1f}')
+
+        # 风险速度
+        vel = np.asarray(tm['velocity'], dtype=float)
+        lines.append('  风险速度 velocity  (前 30 步最小二乘斜率)')
+        lines.append(_stat_line('velocity', vel))
+        _append_rank_table(lines, f'  速度最高 top {top_n} (velocity 最大):',
+                           nodes, g, town_data, vel, largest=True, top_n=top_n)
+        _append_rank_table(lines, f'  速度最低 top {top_n} (velocity 最小):',
+                           nodes, g, town_data, vel, largest=False, top_n=top_n)
+
+    lines.append('')
+
+    # ── M2: 方向性风险归因 ──
+    if attribution_data is None:
+        lines.append('[M2] 未记录归因数据 (record_attribution=False)')
+    else:
+        ad = attribution_data
+        lines.append('[M2] 方向性风险归因')
+        lines.append('')
+        lines.append(f"    {'closed_form_residual':<26} "
+                     f"{ad['closed_form_residual']:.3e}")
+        lines.append('')
+
+        # 净流入 / 净流出
+        n_in = np.asarray(ad['net_inflow'], dtype=float)
+        n_out = np.asarray(ad['net_outflow'], dtype=float)
+        lines.append('  净流入 net_inflow  (F_net 按行汇总 = 流入本县的风险)')
+        lines.append(_stat_line('net_inflow', n_in))
+        lines.append('  净流出 net_outflow (F_net 按列汇总 = 本县流出的风险)')
+        lines.append(_stat_line('net_outflow', n_out))
+        bal = n_in - n_out
+        lines.append(f"    {'净流入-净流出':<26} "
+                     f"sum={bal.sum():.6g}  mean={bal.mean():.6g}  "
+                     f"max={bal.max():.6g}  min={bal.min():.6g}")
+        lines.append('')
+        _append_rank_table(lines, f'  净流入最高 top {top_n}:',
+                           nodes, g, town_data, n_in, largest=True, top_n=top_n)
+        _append_rank_table(lines, f'  净流出最高 top {top_n}:',
+                           nodes, g, town_data, n_out, largest=True, top_n=top_n)
+        _append_rank_table(lines, f'  净流入-净流出最高 top {top_n} (净接收者):',
+                           nodes, g, town_data, bal, largest=True, top_n=top_n)
+        _append_rank_table(lines, f'  净流入-净流出最低 top {top_n} (净输出者):',
+                           nodes, g, town_data, bal, largest=False, top_n=top_n)
+
+        # 风险流矩阵
+        lines.append('  风险流矩阵 F_morning / F_evening / F_net')
+        _append_matrix_edges(lines, 'F_morning (去程 morning)', ad['F_morning'],
+                             nodes, g, town_data, top_n=top_n)
+        _append_matrix_edges(lines, 'F_evening (回程 evening)', ad['F_evening'],
+                             nodes, g, town_data, top_n=top_n)
+        _append_matrix_edges(lines, 'F_net     (morning+evening)', ad['F_net'],
+                             nodes, g, town_data, top_n=top_n)
+        _append_matrix_edges(lines, 'F_net_norm (归一化后)', ad['F_net_norm'],
+                             nodes, g, town_data, top_n=top_n)
+
+        # 风险来源归属（每个县列出贡献最大的若干来源县）
+        top_sources = ad['top_sources']
+        order = np.argsort(-n_in, kind='stable')[:top_n]
+        lines.append(f'  风险来源归属（按净流入排序的前 {len(order)} 个县，'
+                     f'每县列出前 {5} 个来源）')
+        for rank, i in enumerate(order, 1):
+            i = int(i)
+            srcs = top_sources.get(i, [])
+            lines.append(f"    #{rank:<3d} node={str(nodes[i]):<6s} "
+                         f"inflow={n_in[i]:.6g}  outflow={n_out[i]:.6g}  "
+                         f"{_node_name(g, town_data, nodes[i])}")
+            if not srcs:
+                lines.append('        (no positive inflow source)')
+            for sj, val in srcs:
+                lines.append(f"        <- node={str(nodes[sj]):<6s} {val:>15.6g}   "
+                             f"{_node_name(g, town_data, nodes[sj])}")
+        lines.append('')
+
+    return '\n'.join(lines)
+
+
+# ============================================================
 # ComputeWorker — 主计算执行线程
 # ============================================================
 
@@ -641,6 +867,11 @@ class ComputeWorker(QThread):
                 self.log_message.emit(
                     f"  M2: closed-form residual = "
                     f"{attribution_data['closed_form_residual']:.3e}")
+
+            # M1 / M2 指标明细
+            self.log_message.emit(
+                format_m1_m2_log(list(g.nodes()), g, town_data,
+                                 transient_metrics, attribution_data))
 
             # 验证归一化
             er_sum = float(epidemic_risk.sum())
