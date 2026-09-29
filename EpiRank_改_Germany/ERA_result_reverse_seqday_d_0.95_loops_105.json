@@ -69,8 +69,8 @@
       "Index": "HITS-Hub",
       "Disease": "Flu",
       "Pearson_r": 0.4675,
-      "Spearman_rho": 0.1328,
-      "Kendall_tau": 0.0884,
+      "Spearman_rho": 0.1417,
+      "Kendall_tau": 0.094,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -79,8 +79,8 @@
       "Index": "HITS-Hub",
       "Disease": "NV",
       "Pearson_r": 0.7339,
-      "Spearman_rho": 0.3202,
-      "Kendall_tau": 0.2141,
+      "Spearman_rho": 0.2903,
+      "Kendall_tau": 0.1881,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -89,8 +89,8 @@
       "Index": "HITS-Hub",
       "Disease": "COVID-19",
       "Pearson_r": 0.6492,
-      "Spearman_rho": -0.0445,
-      "Kendall_tau": -0.0272,
+      "Spearman_rho": -0.0801,
+      "Kendall_tau": -0.0523,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -99,8 +99,8 @@
       "Index": "HITS-Authority",
       "Disease": "Flu",
       "Pearson_r": 0.4676,
-      "Spearman_rho": 0.1352,
-      "Kendall_tau": 0.0889,
+      "Spearman_rho": 0.1236,
+      "Kendall_tau": 0.0798,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -109,8 +109,8 @@
       "Index": "HITS-Authority",
       "Disease": "NV",
       "Pearson_r": 0.7339,
-      "Spearman_rho": 0.294,
-      "Kendall_tau": 0.192,
+      "Spearman_rho": 0.2749,
+      "Kendall_tau": 0.1755,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -119,8 +119,8 @@
       "Index": "HITS-Authority",
       "Disease": "COVID-19",
       "Pearson_r": 0.6494,
-      "Spearman_rho": -0.0874,
-      "Kendall_tau": -0.0575,
+      "Spearman_rho": -0.1111,
+      "Kendall_tau": -0.0743,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -5684,37 +5684,37 @@
       },
       "63": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Düsseldorf, Kreisfreie Stadt",
         "town": "Düsseldorf, Kreisfreie Stadt"
       },
       "64": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Duisburg, Kreisfreie Stadt",
         "town": "Duisburg, Kreisfreie Stadt"
       },
       "65": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Essen, Kreisfreie Stadt",
         "town": "Essen, Kreisfreie Stadt"
       },
       "66": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Krefeld, Kreisfreie Stadt",
         "town": "Krefeld, Kreisfreie Stadt"
       },
       "67": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Mönchengladbach, Kreisfreie Stadt",
         "town": "Mönchengladbach, Kreisfreie Stadt"
       },
       "68": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Mülheim an der Ruhr, Kreisfreie Stadt",
         "town": "Mülheim an der Ruhr, Kreisfreie Stadt"
       },
@@ -5744,7 +5744,7 @@
       },
       "73": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Kleve, Kreis",
         "town": "Kleve, Kreis"
       },
@@ -5774,7 +5774,7 @@
       },
       "79": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Köln, Kreisfreie Stadt",
         "town": "Köln, Kreisfreie Stadt"
       },
@@ -5786,7 +5786,7 @@
       },
       "81": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Städteregion Aachen (einschl. Stadt Aachen)",
         "town": "Städteregion Aachen (einschl. Stadt Aachen)"
       },
@@ -5804,13 +5804,13 @@
       },
       "84": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Euskirchen, Kreis",
         "town": "Euskirchen, Kreis"
       },
       "85": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Heinsberg, Kreis",
         "town": "Heinsberg, Kreis"
       },
@@ -5828,7 +5828,7 @@
       },
       "88": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rhein-Sieg-Kreis",
         "town": "Rhein-Sieg-Kreis"
       },
@@ -5924,7 +5924,7 @@
       },
       "128": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rheingau-Taunus-Kreis",
         "town": "Rheingau-Taunus-Kreis"
       },
@@ -5966,7 +5966,7 @@
       },
       "155": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Eifelkreis Bitburg-Prüm",
         "town": "Eifelkreis Bitburg-Prüm"
       },
@@ -6116,7 +6116,7 @@
       },
       "160": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Landau in der Pfalz, Kreisfreie Stadt",
         "town": "Landau in der Pfalz, Kreisfreie Stadt"
       },
@@ -6128,7 +6128,7 @@
       },
       "162": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Mainz, Kreisfreie Stadt",
         "town": "Mainz, Kreisfreie Stadt"
       },
@@ -6170,7 +6170,7 @@
       },
       "171": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Germersheim, Landkreis",
         "town": "Germersheim, Landkreis"
       },
@@ -6188,7 +6188,7 @@
       },
       "174": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Südliche Weinstraße, Landkreis",
         "town": "Südliche Weinstraße, Landkreis"
       },
@@ -6224,13 +6224,13 @@
       },
       "192": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Karlsruhe, Stadtkreis",
         "town": "Karlsruhe, Stadtkreis"
       },
       "193": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Karlsruhe, Landkreis",
         "town": "Karlsruhe, Landkreis"
       },
@@ -6296,7 +6296,7 @@
       },
       "194": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rastatt, Landkreis",
         "town": "Rastatt, Landkreis"
       },
@@ -6308,25 +6308,25 @@
       },
       "321": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Saarlouis, Landkreis",
         "town": "Saarlouis, Landkreis"
       },
       "164": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Pirmasens, Kreisfreie Stadt",
         "town": "Pirmasens, Kreisfreie Stadt"
       },
       "177": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Südwestpfalz, Landkreis",
         "town": "Südwestpfalz, Landkreis"
       },
       "182": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ludwigsburg, Landkreis",
         "town": "Ludwigsburg, Landkreis"
       },
@@ -6356,7 +6356,7 @@
       },
       "216": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ulm, Stadtkreis",
         "town": "Ulm, Stadtkreis"
       },
@@ -6380,7 +6380,7 @@
       },
       "323": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "St. Wendel, Landkreis",
         "town": "St. Wendel, Landkreis"
       },
@@ -6458,7 +6458,7 @@
       },
       "191": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Baden-Baden, Stadtkreis",
         "town": "Baden-Baden, Stadtkreis"
       },
@@ -6470,7 +6470,7 @@
       },
       "178": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Stuttgart, Landeshauptstadt, Stadtkreis",
         "town": "Stuttgart, Landeshauptstadt, Stadtkreis"
       },
@@ -6482,7 +6482,7 @@
       },
       "202": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Freudenstadt, Landkreis",
         "town": "Freudenstadt, Landkreis"
       },
@@ -6500,13 +6500,13 @@
       },
       "180": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Esslingen, Landkreis",
         "town": "Esslingen, Landkreis"
       },
       "214": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Tübingen, Landkreis",
         "town": "Tübingen, Landkreis"
       },
@@ -6530,7 +6530,7 @@
       },
       "207": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rottweil, Landkreis",
         "town": "Rottweil, Landkreis"
       },
@@ -6548,7 +6548,7 @@
       },
       "210": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Konstanz, Landkreis",
         "town": "Konstanz, Landkreis"
       },
@@ -6560,7 +6560,7 @@
       },
       "215": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Zollernalbkreis, Landkreis",
         "town": "Zollernalbkreis, Landkreis"
       },
@@ -6578,13 +6578,13 @@
       },
       "304": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Augsburg",
         "town": "Augsburg"
       },
       "311": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Günzburg, Landkreis",
         "town": "Günzburg, Landkreis"
       },
@@ -6680,7 +6680,7 @@
       },
       "211": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Lörrach, Landkreis",
         "town": "Lörrach, Landkreis"
       },
@@ -6782,7 +6782,7 @@
       },
       "242": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Starnberg, Landkreis",
         "town": "Starnberg, Landkreis"
       },
@@ -6818,7 +6818,7 @@
       },
       "204": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Breisgau-Hochschwarzwald, Landkreis",
         "town": "Breisgau-Hochschwarzwald, Landkreis"
       },
@@ -6842,55 +6842,55 @@
       },
       "317": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Oberallgäu, Landkreis",
         "town": "Oberallgäu, Landkreis"
       },
       "236": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Miesbach, Landkreis",
         "town": "Miesbach, Landkreis"
       },
       "227": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bad Tölz-Wolfratshausen, Landkreis",
         "town": "Bad Tölz-Wolfratshausen, Landkreis"
       },
       "306": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Kempten (Allgäu)",
         "town": "Kempten (Allgäu)"
       },
       "314": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ostallgäu, Landkreis",
         "town": "Ostallgäu, Landkreis"
       },
       "234": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Garmisch-Partenkirchen, Landkreis",
         "town": "Garmisch-Partenkirchen, Landkreis"
       },
       "244": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Weilheim-Schongau, Landkreis",
         "town": "Weilheim-Schongau, Landkreis"
       },
       "223": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "München, Landeshauptstadt",
         "town": "München, Landeshauptstadt"
       },
       "229": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ebersberg, Landkreis",
         "town": "Ebersberg, Landkreis"
       },
@@ -6914,7 +6914,7 @@
       },
       "238": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "München, Landkreis",
         "town": "München, Landkreis"
       },
@@ -7010,7 +7010,7 @@
       },
       "246": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Passau",
         "town": "Passau"
       },
@@ -7990,7 +7990,7 @@
       },
       "92": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Borken, Kreis",
         "town": "Borken, Kreis"
       },
@@ -8050,7 +8050,7 @@
       },
       "105": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Dortmund, Kreisfreie Stadt",
         "town": "Dortmund, Kreisfreie Stadt"
       },
@@ -8074,7 +8074,7 @@
       },
       "109": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ennepe-Ruhr-Kreis",
         "town": "Ennepe-Ruhr-Kreis"
       },
@@ -8086,19 +8086,19 @@
       },
       "63": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Düsseldorf, Kreisfreie Stadt",
         "town": "Düsseldorf, Kreisfreie Stadt"
       },
       "64": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Duisburg, Kreisfreie Stadt",
         "town": "Duisburg, Kreisfreie Stadt"
       },
       "65": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Essen, Kreisfreie Stadt",
         "town": "Essen, Kreisfreie Stadt"
       },
@@ -8110,13 +8110,13 @@
       },
       "67": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Mönchengladbach, Kreisfreie Stadt",
         "town": "Mönchengladbach, Kreisfreie Stadt"
       },
       "68": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Mülheim an der Ruhr, Kreisfreie Stadt",
         "town": "Mülheim an der Ruhr, Kreisfreie Stadt"
       },
@@ -8128,7 +8128,7 @@
       },
       "70": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Remscheid, Kreisfreie Stadt",
         "town": "Remscheid, Kreisfreie Stadt"
       },
@@ -8140,13 +8140,13 @@
       },
       "72": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Wuppertal, Kreisfreie Stadt",
         "town": "Wuppertal, Kreisfreie Stadt"
       },
       "73": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Kleve, Kreis",
         "town": "Kleve, Kreis"
       },
@@ -8164,19 +8164,19 @@
       },
       "76": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Viersen, Kreis",
         "town": "Viersen, Kreis"
       },
       "78": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bonn, Kreisfreie Stadt",
         "town": "Bonn, Kreisfreie Stadt"
       },
       "79": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Köln, Kreisfreie Stadt",
         "town": "Köln, Kreisfreie Stadt"
       },
@@ -8200,19 +8200,19 @@
       },
       "83": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rhein-Erft-Kreis",
         "town": "Rhein-Erft-Kreis"
       },
       "84": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Euskirchen, Kreis",
         "town": "Euskirchen, Kreis"
       },
       "85": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Heinsberg, Kreis",
         "town": "Heinsberg, Kreis"
       },
@@ -8230,13 +8230,13 @@
       },
       "88": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rhein-Sieg-Kreis",
         "town": "Rhein-Sieg-Kreis"
       },
       "89": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Bottrop, Kreisfreie Stadt",
         "town": "Bottrop, Kreisfreie Stadt"
       },
@@ -8260,7 +8260,7 @@
       },
       "108": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Herne, Kreisfreie Stadt",
         "town": "Herne, Kreisfreie Stadt"
       },
@@ -8302,7 +8302,7 @@
       },
       "149": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Neuwied, Landkreis",
         "town": "Neuwied, Landkreis"
       },
@@ -8344,7 +8344,7 @@
       },
       "147": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Cochem-Zell, Landkreis",
         "town": "Cochem-Zell, Landkreis"
       },
@@ -8368,7 +8368,7 @@
       },
       "155": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Eifelkreis Bitburg-Prüm",
         "town": "Eifelkreis Bitburg-Prüm"
       },
@@ -8398,7 +8398,7 @@
       },
       "119": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Wiesbaden, Landeshauptstadt, Kreisfreie Stadt",
         "town": "Wiesbaden, Landeshauptstadt, Kreisfreie Stadt"
       },
@@ -8494,7 +8494,7 @@
       },
       "145": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Bad Kreuznach, Landkreis",
         "town": "Bad Kreuznach, Landkreis"
       },
@@ -8506,7 +8506,7 @@
       },
       "158": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Frankenthal (Pfalz), Kreisfreie Stadt",
         "town": "Frankenthal (Pfalz), Kreisfreie Stadt"
       },
@@ -8518,19 +8518,19 @@
       },
       "160": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Landau in der Pfalz, Kreisfreie Stadt",
         "town": "Landau in der Pfalz, Kreisfreie Stadt"
       },
       "161": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ludwigshafen am Rhein, Kreisfreie Stadt",
         "town": "Ludwigshafen am Rhein, Kreisfreie Stadt"
       },
       "162": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Mainz, Kreisfreie Stadt",
         "town": "Mainz, Kreisfreie Stadt"
       },
@@ -8548,13 +8548,13 @@
       },
       "166": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Worms, Kreisfreie Stadt",
         "town": "Worms, Kreisfreie Stadt"
       },
       "168": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Alzey-Worms, Landkreis",
         "town": "Alzey-Worms, Landkreis"
       },
@@ -8590,7 +8590,7 @@
       },
       "174": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Südliche Weinstraße, Landkreis",
         "town": "Südliche Weinstraße, Landkreis"
       },
@@ -8608,7 +8608,7 @@
       },
       "184": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Heilbronn, Stadtkreis",
         "town": "Heilbronn, Stadtkreis"
       },
@@ -8626,7 +8626,7 @@
       },
       "192": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Karlsruhe, Stadtkreis",
         "town": "Karlsruhe, Stadtkreis"
       },
@@ -8698,7 +8698,7 @@
       },
       "194": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rastatt, Landkreis",
         "town": "Rastatt, Landkreis"
       },
@@ -8710,25 +8710,25 @@
       },
       "321": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Saarlouis, Landkreis",
         "town": "Saarlouis, Landkreis"
       },
       "164": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Pirmasens, Kreisfreie Stadt",
         "town": "Pirmasens, Kreisfreie Stadt"
       },
       "177": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Südwestpfalz, Landkreis",
         "town": "Südwestpfalz, Landkreis"
       },
       "182": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ludwigsburg, Landkreis",
         "town": "Ludwigsburg, Landkreis"
       },
@@ -8740,7 +8740,7 @@
       },
       "201": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Enzkreis, Landkreis",
         "town": "Enzkreis, Landkreis"
       },
@@ -8758,7 +8758,7 @@
       },
       "216": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ulm, Stadtkreis",
         "town": "Ulm, Stadtkreis"
       },
@@ -8782,7 +8782,7 @@
       },
       "323": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "St. Wendel, Landkreis",
         "town": "St. Wendel, Landkreis"
       },
@@ -8830,7 +8830,7 @@
       },
       "167": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Zweibrücken, Kreisfreie Stadt",
         "town": "Zweibrücken, Kreisfreie Stadt"
       },
@@ -8842,13 +8842,13 @@
       },
       "319": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Merzig-Wadern, Landkreis",
         "town": "Merzig-Wadern, Landkreis"
       },
       "320": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Neunkirchen, Landkreis",
         "town": "Neunkirchen, Landkreis"
       },
@@ -8860,19 +8860,19 @@
       },
       "191": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Baden-Baden, Stadtkreis",
         "town": "Baden-Baden, Stadtkreis"
       },
       "200": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Calw, Landkreis",
         "town": "Calw, Landkreis"
       },
       "178": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Stuttgart, Landeshauptstadt, Stadtkreis",
         "town": "Stuttgart, Landeshauptstadt, Stadtkreis"
       },
@@ -8884,7 +8884,7 @@
       },
       "202": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Freudenstadt, Landkreis",
         "town": "Freudenstadt, Landkreis"
       },
@@ -8896,13 +8896,13 @@
       },
       "183": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rems-Murr-Kreis, Landkreis",
         "town": "Rems-Murr-Kreis, Landkreis"
       },
       "180": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Esslingen, Landkreis",
         "town": "Esslingen, Landkreis"
       },
@@ -8932,7 +8932,7 @@
       },
       "207": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rottweil, Landkreis",
         "town": "Rottweil, Landkreis"
       },
@@ -8962,13 +8962,13 @@
       },
       "215": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Zollernalbkreis, Landkreis",
         "town": "Zollernalbkreis, Landkreis"
       },
       "217": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Alb-Donau-Kreis, Landkreis",
         "town": "Alb-Donau-Kreis, Landkreis"
       },
@@ -8980,13 +8980,13 @@
       },
       "304": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Augsburg",
         "town": "Augsburg"
       },
       "311": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Günzburg, Landkreis",
         "town": "Günzburg, Landkreis"
       },
@@ -8998,7 +8998,7 @@
       },
       "310": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Dillingen a.d.Donau, Landkreis",
         "town": "Dillingen a.d.Donau, Landkreis"
       },
@@ -9064,7 +9064,7 @@
       },
       "315": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Unterallgäu, Landkreis",
         "town": "Unterallgäu, Landkreis"
       },
@@ -9082,13 +9082,13 @@
       },
       "211": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Lörrach, Landkreis",
         "town": "Lörrach, Landkreis"
       },
       "212": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Waldshut, Landkreis",
         "town": "Waldshut, Landkreis"
       },
@@ -9172,7 +9172,7 @@
       },
       "228": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Dachau, Landkreis",
         "town": "Dachau, Landkreis"
       },
@@ -9184,13 +9184,13 @@
       },
       "242": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Starnberg, Landkreis",
         "town": "Starnberg, Landkreis"
       },
       "305": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Kaufbeuren",
         "town": "Kaufbeuren"
       },
@@ -9220,7 +9220,7 @@
       },
       "204": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Breisgau-Hochschwarzwald, Landkreis",
         "town": "Breisgau-Hochschwarzwald, Landkreis"
       },
@@ -9232,7 +9232,7 @@
       },
       "313": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Lindau (Bodensee), Landkreis",
         "town": "Lindau (Bodensee), Landkreis"
       },
@@ -9244,7 +9244,7 @@
       },
       "317": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Oberallgäu, Landkreis",
         "town": "Oberallgäu, Landkreis"
       },
@@ -9268,13 +9268,13 @@
       },
       "314": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ostallgäu, Landkreis",
         "town": "Ostallgäu, Landkreis"
       },
       "234": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Garmisch-Partenkirchen, Landkreis",
         "town": "Garmisch-Partenkirchen, Landkreis"
       },
@@ -9286,13 +9286,13 @@
       },
       "223": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "München, Landeshauptstadt",
         "town": "München, Landeshauptstadt"
       },
       "229": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ebersberg, Landkreis",
         "town": "Ebersberg, Landkreis"
       },
@@ -9388,7 +9388,7 @@
       },
       "224": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rosenheim",
         "town": "Rosenheim"
       },
@@ -9400,7 +9400,7 @@
       },
       "243": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Traunstein, Landkreis",
         "town": "Traunstein, Landkreis"
       },
@@ -9430,7 +9430,7 @@
       },
       "252": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Passau, Landkreis",
         "town": "Passau, Landkreis"
       },

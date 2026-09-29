@@ -549,12 +549,27 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
         E_uniform = np.ones((N, N)) / float(N)
         M_day = (1.0 - d) * E_uniform + d * (CNt @ CN)
         eigvals = np.linalg.eigvals(M_day)
+
+        # ---- 绝对谱隙（保留，用于混合速度报告）----
         abs_eig = np.sort(np.abs(eigvals))[::-1]
-        lambda1 = float(abs_eig[0])
-        lambda2 = float(abs_eig[1]) if len(abs_eig) > 1 else 0.0
-        spectral_gap = 1.0 - lambda2 / lambda1 if lambda1 > 1e-12 else 0.0
-        kemeny_constant = (1.0 / spectral_gap
-                           if spectral_gap > 1e-6 else float('inf'))
+        abs_lambda1 = float(abs_eig[0])
+        abs_lambda2 = float(abs_eig[1]) if len(abs_eig) > 1 else 0.0
+        spectral_gap = 1.0 - abs_lambda2 / abs_lambda1 if abs_lambda1 > 1e-12 else 0.0
+
+        # ---- 经典 Kemeny 常数 ----
+        # K = Σ_{r≥2} 1 / (1 - λ_r)，约定 m_ii = 0
+        # 1. 找出 Perron 根（最接近 1 的那个特征值）并从谱中剔除
+        idx_perron = int(np.argmin(np.abs(eigvals - 1.0)))
+        non_perron = np.delete(eigvals, idx_perron)
+
+        # 2. 剔除后可能仍有接近 1 的数值噪声，做一次数值清理
+        non_perron = non_perron[np.abs(1.0 - non_perron) > 1e-12]
+
+        # 3. 求和；复数共轭对会自动抵消虚部，取实部即可
+        if non_perron.size == 0:
+            kemeny_constant = float('inf')
+        else:
+            kemeny_constant = float(np.real(np.sum(1.0 / (1.0 - non_perron))))
 
         transient_metrics = {
             'trajectory': traj,
@@ -562,8 +577,8 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
             'velocity': velocity,
             'spectral_gap': spectral_gap,
             'kemeny_constant': kemeny_constant,
-            'lambda1': lambda1,
-            'lambda2': lambda2,
+            'abs_lambda1': abs_lambda1,
+            'abs_lambda2': abs_lambda2,
             'er_star': er_star,
         }
 
@@ -733,12 +748,15 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         lines.append(f'[M1] 瞬态动力学  T={T} iterations, N={N} nodes')
         lines.append('')
 
-        lines.append('  谱性质')
-        lines.append(_stat_line('lambda1', [tm['lambda1']]))
-        lines.append(_stat_line('lambda2', [tm['lambda2']]))
-        lines.append(f"    {'spectral_gap':<26} {tm['spectral_gap']:.6g}")
+        lines.append('  谱性质'
+                     '（abs gap = 1-|λ₂|/|λ₁| 只看 λ₂；'
+                     'Kemeny = Σ_{r≥2} 1/(1-λ_r) 用到完整谱）')
+        lines.append(_stat_line('abs(lambda1)', [tm['abs_lambda1']]))
+        lines.append(_stat_line('abs(lambda2)', [tm['abs_lambda2']]))
+        lines.append(f"    {'abs_spectral_gap 1-|l2|/|l1|':<26} "
+                     f"{tm['spectral_gap']:.6g}")
         kem = tm['kemeny_constant']
-        lines.append(f"    {'kemeny_constant':<26} "
+        lines.append(f"    {'kemeny_constant sum 1/(1-lr)':<26} "
                      f"{'inf' if not np.isfinite(kem) else format(kem, '.6g')}")
         lines.append('')
 
@@ -904,8 +922,8 @@ class ComputeWorker(QThread):
             self.log_message.emit(f"  Converged after {iterations} iterations.")
             if transient_metrics is not None:
                 self.log_message.emit(
-                    f"  M1: spectral_gap={transient_metrics['spectral_gap']:.5f}, "
-                    f"Kemeny={transient_metrics['kemeny_constant']:.2f}")
+                    f"  M1: abs_spectral_gap={transient_metrics['spectral_gap']:.5f}, "
+                    f"Kemeny(sum 1/(1-lr))={transient_metrics['kemeny_constant']:.2f}")
             if attribution_data is not None:
                 self.log_message.emit(
                     f"  M2: closed-form residual = "
@@ -2697,10 +2715,10 @@ class EpiRankMainWindow(QMainWindow):
         ax_d.tick_params(labelsize=7)
 
         info_text = (
-            f"spectral gap  1−λ₂ = {tm['spectral_gap']:.5f}\n"
-            f"Kemeny constant   = {tm['kemeny_constant']:.2f}\n"
-            f"λ₁ = {tm['lambda1']:.6f}\n"
-            f"λ₂ = {tm['lambda2']:.6f}"
+            f"{'abs gap |λ₂|/|λ₁|':<20} = {tm['spectral_gap']:.5f}\n"
+            f"{'Kemeny Σ 1/(1-λᵣ)':<20} = {tm['kemeny_constant']:.2f}\n"
+            f"{'|λ₁|':<20} = {tm['abs_lambda1']:.6f}\n"
+            f"{'|λ₂|':<20} = {tm['abs_lambda2']:.6f}"
         )
         ax_d.text(0.98, 0.97, info_text,
                   transform=ax_d.transAxes,
