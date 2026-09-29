@@ -3172,7 +3172,7 @@ class EpiRankMainWindow(QMainWindow):
         payload = {
             'metadata': {
                 # 注意：两份文件的 mode 值不同，保持原样即可
-                'mode':       'reverse_sequential_day',   # 或 'sequential_day'
+                'mode':       'sequential_day',   # 或 'sequential_day'
                 'd':          r['d'],
                 'iterations': r['iterations'],
             },
