@@ -938,7 +938,11 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
                               (1.0 - daytime) * (CN @ epidemic_risk)))
         iterations = i + 1
 
-        if np.allclose(epidemic_risk, old_er, atol=1e-12):
+        # 收敛判据用显式无穷范数。np.allclose 的实际容差是
+        # atol + rtol*|b|，rtol 默认 1e-5；本表 N=353、ER ≈ 1/N ≈ 0.0028 时
+        # 约为 2.8e-8，比这里要求的 1e-12 松四个数量级，会在 d 较小时提前
+        # 退出（实测 d=0.85/daytime=0.5 提前 59 步），使 iterations 偏小。
+        if np.max(np.abs(epidemic_risk - old_er)) < 1e-12:
             break
 
         if progress_callback and (i % 50 == 0 or i == number_of_loops - 1):

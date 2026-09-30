@@ -508,7 +508,11 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
             trajectory.append(epidemic_risk.flatten().copy())
 
         iterations = i + 1
-        if np.allclose(epidemic_risk, old_er, atol=1e-12):
+        # 收敛判据用显式无穷范数。np.allclose 的实际容差是
+        # atol + rtol*|b|，rtol 默认 1e-5；ER ≈ 1/N ≈ 0.003 时约为
+        # 2.8e-8，比这里要求的 1e-12 松四个数量级，会提前收敛、
+        # 使轨迹 T 偏短并影响 Af_i / velocity / ER*。
+        if np.max(np.abs(epidemic_risk - old_er)) < 1e-12:
             break
 
         if progress_callback and (i % 50 == 0 or i == number_of_loops - 1):
@@ -524,13 +528,23 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
         er_star = traj[-1]
 
         # (1) 到达时间 t_i（θ=0.5）
-        theta = 0.5
-        arrival_time = np.full(N, np.inf)
+        er_0_val = 1.0 / N          # 均匀初始风险
+
+        # ── 风险半程调整时间 Af_i ──
+        # Af_i = min{ t : |ER_t(i) - ER*_i| <= 0.5 * |ER_0(i) - ER*_i| }
+        half_time = np.full(N, np.nan)
+        unchanged = np.zeros(N, dtype=bool)
         for i in range(N):
-            if er_star[i] > 1e-15:
-                hits = np.where(traj[:, i] >= theta * er_star[i])[0]
-                if len(hits) > 0:
-                    arrival_time[i] = float(hits[0])
+            denom = abs(er_0_val - er_star[i])
+            if denom < 1e-12:
+                # ER*_i ≈ ER_0(i)：风险几乎不变化，Af_i 记为 0 并排除统计
+                half_time[i] = 0.0
+                unchanged[i] = True
+                continue
+            threshold = 0.5 * denom
+            hits = np.where(np.abs(traj[:, i] - er_star[i]) <= threshold)[0]
+            if len(hits) > 0:
+                half_time[i] = float(hits[0] + 1)   # 轨迹第 0 项对应第 1 次日迭代
 
         # (2) 风险速度 v_i（前 K 步斜率）
         K = min(30, T)
@@ -569,7 +583,8 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
 
         transient_metrics = {
             'trajectory': traj,
-            'arrival_time': arrival_time,
+            'half_time':       half_time,       # 半程调整时间 Af_i
+            'unchanged':       unchanged,        # 标记 ER* ≈ ER_0 的节点
             'velocity': velocity,
             'spectral_gap': spectral_gap,
             'kemeny_constant': kemeny_constant,
@@ -761,8 +776,18 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         lines.append(f"    {'t=0 sum':<26} {traj[0].sum():.10f}")
         lines.append(f"    {'t=T-1 sum':<26} {traj[-1].sum():.10f}")
         er_star = np.asarray(tm['er_star'], dtype=float)
-        dev = np.abs(traj[-1] - er_star)
-        lines.append(f"    {'max|traj[-1]-ER*|':<26} {dev.max():.6g}")
+
+        # er_star 本身就是 traj[-1]，两者相减恒为 0，没有信息量。
+        # 真正有意义的是「迭代解 vs 闭式解」的偏差，故取 M2 的
+        # er_star_closed；未记录归因数据（或闭式解求解失败）时标 N/A。
+        er_star_closed = (attribution_data or {}).get('er_star_closed')
+        if er_star_closed is not None:
+            dev = np.abs(np.asarray(er_star_closed, dtype=float) - er_star)
+            lines.append(f"    {'max|ER_iter-ER_closed|':<26} "
+                         f"{dev.max():.6g}")
+        else:
+            lines.append(f"    {'max|ER_iter-ER_closed|':<26} "
+                         f'N/A (需 record_attribution=True)')
         if T <= LOG_TRAJ_FULL:
             rows = list(range(T))
         else:
@@ -779,13 +804,25 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
             lines.append(f'      (only first/last 5 of {T} iterations shown)')
         lines.append('')
 
-        # 到达时间
-        at = np.asarray(tm['arrival_time'], dtype=float)
-        lines.append('  到达时间 arrival_time  (首次满足 ER_t >= 0.5 * ER* 的迭代号)')
-        lines.append(_stat_line('arrival_time', at))
-        lines.append(f"    {'never reached (inf)':<26} {int(np.isinf(at).sum())}")
-        _append_rank_table(lines, f'  最快到达 top {top_n} (arrival_time 最小):',
-                           nodes, g, town_data, at, largest=False,
+        # 风险半程调整时间
+        ht = np.asarray(tm['half_time'], dtype=float)
+        unchanged = np.asarray(
+            tm.get('unchanged', np.zeros(ht.size, dtype=bool)), dtype=bool)
+        lines.append('  风险半程调整时间 Af_i  '
+                     '(首次满足 |ER_t - ER*| <= 0.5 * |ER_0 - ER*| 的迭代号)')
+
+        # 统计时排除 ER* ≈ ER_0 的节点
+        ht_stat = ht[~unchanged]
+        lines.append(_stat_line('Af_i', ht_stat))
+        lines.append(f"    {'excluded (ER*≈ER0)':<26} {int(unchanged.sum())}")
+        lines.append(f"    {'never reached (nan)':<26} "
+                     f"{int(np.isnan(ht_stat).sum())}")
+
+        # 排名同样排除 unchanged：置 nan，由 _append_rank_table 自动跳过
+        ht_rank = ht.copy()
+        ht_rank[unchanged] = np.nan
+        _append_rank_table(lines, f'  最快调整 top {top_n} (Af_i 最小):',
+                           nodes, g, town_data, ht_rank, largest=False,
                            top_n=top_n, fmt='{:.1f}')
 
         # 风险速度
@@ -2579,7 +2616,7 @@ class EpiRankMainWindow(QMainWindow):
 
     # ---- Tab 14: Transient Dynamics（M1）----
     def _draw_transient(self):
-        """M1 瞬态动力学：轨迹、到达时间、速度、COVID-19 leading indicator。"""
+        """M1 瞬态动力学：轨迹、半程调整时间、速度、COVID-19 leading indicator。"""
         self.fig_transient.clear()
 
         r = self.results
@@ -2593,7 +2630,10 @@ class EpiRankMainWindow(QMainWindow):
 
         tm = r['transient_metrics']
         traj = tm['trajectory']
-        arrival = tm['arrival_time']
+        half_time = np.asarray(tm['half_time'], dtype=float)
+        unchanged = np.asarray(
+            tm.get('unchanged', np.zeros(half_time.size, dtype=bool)),
+            dtype=bool)
         velocity = tm['velocity']
         er_star = tm['er_star']
         g = r['g']
@@ -2627,11 +2667,12 @@ class EpiRankMainWindow(QMainWindow):
         ax_a.grid(True, alpha=0.25)
         ax_a.tick_params(labelsize=7)
 
-        # ── (b) 到达时间地图 ──
+        # ── (b) 风险半程调整时间地图 ──
         ax_b = self.fig_transient.add_subplot(gs[0, 1])
-        finite_mask = np.isfinite(arrival)
-        vals_plot = arrival.copy()
-        vals_plot[~finite_mask] = np.nan
+        # unchanged（ER*≈ER0）不参与色标，单独画灰色
+        valid_mask = np.isfinite(half_time) & ~unchanged
+        vals_plot = half_time.copy()
+        vals_plot[~valid_mask] = np.nan
         valid = vals_plot[~np.isnan(vals_plot)]
         if len(valid) > 0:
             vmin, vmax = float(valid.min()), float(valid.max())
@@ -2643,32 +2684,50 @@ class EpiRankMainWindow(QMainWindow):
                          edgecolors='none', zorder=1)
 
             xs = [npos[nodes_list[i]][0] for i in range(N)
-                  if nodes_list[i] in npos and np.isfinite(arrival[i])]
+                  if nodes_list[i] in npos and valid_mask[i]]
             ys = [npos[nodes_list[i]][1] for i in range(N)
-                  if nodes_list[i] in npos and np.isfinite(arrival[i])]
-            cs = [arrival[i] for i in range(N) if np.isfinite(arrival[i])]
+                  if nodes_list[i] in npos and valid_mask[i]]
+            cs = [half_time[i] for i in range(N) if valid_mask[i]]
             sc = ax_b.scatter(xs, ys, c=cs, s=22,
                               cmap='RdYlBu', vmin=vmin, vmax=vmax,
                               edgecolors='gray', linewidths=0.3, zorder=3)
             cbar = self.fig_transient.colorbar(sc, ax=ax_b,
                                                 fraction=0.035, pad=0.02)
-            cbar.set_label('arrival iteration', fontsize=8)
+            cbar.set_label('half-way adjustment iteration', fontsize=8)
             cbar.ax.tick_params(labelsize=7)
-            n_inf = int((~finite_mask).sum())
-            ax_b.set_title(f'(b) arrival time t_i (θ=0.5) [{n_inf} N/A]',
-                           fontsize=10)
+
+            if unchanged.any():
+                ux = [npos[nodes_list[i]][0] for i in range(N)
+                      if nodes_list[i] in npos and unchanged[i]]
+                uy = [npos[nodes_list[i]][1] for i in range(N)
+                      if nodes_list[i] in npos and unchanged[i]]
+                ax_b.scatter(ux, uy, s=22, c='#808080',
+                             edgecolors='black', linewidths=0.4,
+                             zorder=4)
+
+            # 修改.md 原文写作 (~valid_mask).sum() - unchanged.sum()，
+            # 但 unchanged 的 Af 有限(=0)，与 nan 集合不相交，故直接计 nan
+            n_inf = int((~np.isfinite(half_time)).sum())
+            n_unc = int(unchanged.sum())
+            ax_b.set_title(
+                f'(b) half-way adjustment time Af_i\n'
+                f'[{n_unc} unchanged (gray), {n_inf} N/A]',
+                fontsize=10)
         else:
-            ax_b.set_title('(b) arrival time — no finite values', fontsize=10)
+            ax_b.set_title('(b) half-way adjustment — no finite values',
+                           fontsize=10)
         ax_b.set_aspect(1.0 / np.cos(np.radians(mean_lat)))
         ax_b.axis('off')
 
-        # ── (c) t_i vs COVID-19 病例数 ──
+        # ── (c) Af_i vs COVID-19 病例数 ──
         ax_c = self.fig_transient.add_subplot(gs[1, 0])
         covid_rank = r['covid_case_rank']
         xs_c, ys_c = [], []
         for i, seq in enumerate(nodes_list):
-            if np.isfinite(arrival[i]) and seq in covid_rank:
-                xs_c.append(arrival[i])
+            # 排除 unchanged：其 Af_i=0 仅为占位，非真实调整速度
+            if (np.isfinite(half_time[i]) and not unchanged[i]
+                    and seq in covid_rank):
+                xs_c.append(half_time[i])
                 ys_c.append(covid_rank[seq])
         if len(xs_c) > 5:
             ax_c.scatter(xs_c, ys_c, s=18, c='steelblue',
@@ -2683,31 +2742,54 @@ class EpiRankMainWindow(QMainWindow):
                       va='top', ha='left',
                       bbox=dict(boxstyle='round,pad=0.4',
                                 facecolor='#fffbe6', edgecolor='#cccc88'))
-            ax_c.set_xlabel('arrival iteration t_i', fontsize=9)
+            ax_c.set_xlabel('half-way adjustment time Af_i', fontsize=9)
             ax_c.set_ylabel('COVID-19 total cases', fontsize=9)
-            ax_c.set_title('(c) t_i vs COVID-19 cases (leading indicator check)',
+            ax_c.set_title('(c) Af_i vs COVID-19 cases (leading indicator check)',
                            fontsize=10)
             ax_c.grid(True, alpha=0.25)
         else:
             ax_c.text(0.5, 0.5, 'insufficient data',
                       ha='center', va='center', fontsize=11, color='#888')
-            ax_c.set_title('(c) t_i vs COVID-19 cases', fontsize=10)
+            ax_c.set_title('(c) Af_i vs COVID-19 cases', fontsize=10)
         ax_c.tick_params(labelsize=7)
 
         # ── (d) 速度直方图 + 谱间隙文本框 ──
         ax_d = self.fig_transient.add_subplot(gs[1, 1])
-        pos_vel = velocity[velocity > 0]
-        if len(pos_vel) > 0:
-            log_v = np.log10(pos_vel)
-            ax_d.hist(log_v, bins=30, color='#d2691e',
-                      edgecolor='white', linewidth=0.3, alpha=0.85)
-            ax_d.set_xlabel(r'$\log_{10}(v_i)$  (risk velocity)', fontsize=9)
+        # 速度分布：正负两侧都要画出。负速度往往是多数，原先只画
+        # velocity > 0 会丢掉约 2/3 的节点，故改用 symlog 双侧分布。
+        v_fin = velocity[np.isfinite(velocity)]
+        v_pos = v_fin[v_fin > 0]
+        v_neg = v_fin[v_fin < 0]
+        v_zero = int((v_fin == 0).sum())
+        if v_pos.size or v_neg.size:
+            xmax = float(np.abs(v_fin).max())
+            # linthresh 取最小非零量级：轨迹完全平坦的 v_i = 0 才能落在轴心
+            linth = max(float(np.abs(v_fin[v_fin != 0]).min()), 1e-12)
+            pos_edges = np.logspace(np.log10(linth), np.log10(xmax), 21)
+            bins = np.concatenate([-pos_edges[::-1], [0.0], pos_edges])
+            ax_d.set_xscale('symlog', linthresh=linth, linscale=0.6)
+            ax_d.hist(v_neg, bins=bins, color='#4682b4',
+                      edgecolor='white', linewidth=0.3, alpha=0.85,
+                      label=f'decreasing (n={v_neg.size})')
+            ax_d.hist(v_pos, bins=bins, color='#d2691e',
+                      edgecolor='white', linewidth=0.3, alpha=0.85,
+                      label=f'increasing (n={v_pos.size})')
+            ax_d.axvline(0.0, color='#444444', linestyle='--', linewidth=1.0)
+            if v_zero:
+                ax_d.hist([0.0], bins=bins, color='#999999',
+                          edgecolor='white', linewidth=0.3, alpha=0.85,
+                          label=f'exactly 0, flat (n={v_zero})')
+            ax_d.set_xlabel(r'risk velocity $v_i$   '
+                             r'(← decreasing $\;$ 0 $\;$ increasing →)',
+                            fontsize=9)
             ax_d.set_ylabel('number of counties', fontsize=9)
+            ax_d.legend(fontsize=7, frameon=False, loc='upper left')
         else:
-            ax_d.text(0.5, 0.5, 'no positive velocity',
+            ax_d.text(0.5, 0.5, 'no finite velocity',
                       ha='center', va='center', fontsize=11, color='#888')
             ax_d.set_xlabel('risk velocity', fontsize=9)
-        ax_d.set_title('(d) risk velocity distribution', fontsize=10)
+        ax_d.set_title('(d) risk velocity distribution (both signs)',
+                        fontsize=10)
         ax_d.tick_params(labelsize=7)
 
         info_text = (
