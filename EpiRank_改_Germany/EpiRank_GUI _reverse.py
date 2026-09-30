@@ -527,11 +527,13 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
     # ══════════════════════════════════════════════════════════
     transient_metrics = None
     if record_trajectory and len(trajectory) > 2:
-        traj = np.array(trajectory)
-        T, N = traj.shape
-        er_star = traj[-1]
+        # 轨迹按 (空间单元, 迭代) 存储：
+        #   第 t 列 = 第 t 次迭代后的全局风险状态
+        #   第 i 行 = 第 i 个空间单元在整个迭代过程中的风险变化
+        traj = np.array(trajectory).T          # shape (N, T)
+        N, T = traj.shape
+        er_star = traj[:, -1]
 
-        # (1) 到达时间 t_i（θ=0.5）
         er_0_val = 1.0 / N          # 均匀初始风险
 
         # ── 风险半程调整时间 Af_i ──
@@ -546,7 +548,7 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
                 unchanged[i] = True
                 continue
             threshold = 0.5 * denom
-            hits = np.where(np.abs(traj[:, i] - er_star[i]) <= threshold)[0]
+            hits = np.where(np.abs(traj[i, :] - er_star[i]) <= threshold)[0]
             if len(hits) > 0:
                 half_time[i] = float(hits[0] + 1)   # 轨迹第 0 项对应第 1 次日迭代
 
@@ -555,7 +557,7 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
         t_axis = np.arange(K, dtype=float)
         velocity = np.zeros(N)
         for i in range(N):
-            y = traj[:K, i]
+            y = traj[i, :K]
             if y.std() > 1e-12:
                 velocity[i] = np.polyfit(t_axis, y, 1)[0]
 
@@ -759,7 +761,7 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
     else:
         tm = transient_metrics
         traj = tm['trajectory']
-        T, N = traj.shape
+        N, T = traj.shape
         lines.append(f'[M1] 瞬态动力学  T={T} iterations, N={N} nodes')
         lines.append('')
 
@@ -777,11 +779,11 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
 
         # 轨迹
         lines.append(f'  轨迹 trajectory  shape={traj.shape}')
-        lines.append(f"    {'t=0 sum':<26} {traj[0].sum():.10f}")
-        lines.append(f"    {'t=T-1 sum':<26} {traj[-1].sum():.10f}")
+        lines.append(f"    {'t=0 sum':<26} {traj[:, 0].sum():.10f}")
+        lines.append(f"    {'t=T-1 sum':<26} {traj[:, -1].sum():.10f}")
         er_star = np.asarray(tm['er_star'], dtype=float)
 
-        # er_star 本身就是 traj[-1]，两者相减恒为 0，没有信息量。
+        # er_star 本身就是 traj[:, -1]，两者相减恒为 0，没有信息量。
         # 真正有意义的是「迭代解 vs 闭式解」的偏差，故取 M2 的
         # er_star_closed；未记录归因数据（或闭式解求解失败）时标 N/A。
         er_star_closed = (attribution_data or {}).get('er_star_closed')
@@ -801,7 +803,7 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
             if t is None:
                 lines.append('      ...')
                 continue
-            col = traj[t]
+            col = traj[:, t]
             lines.append(f"      t={t:<5d} mean={col.mean():.6e}  "
                          f"min={col.min():.6e}  max={col.max():.6e}")
         if T > LOG_TRAJ_FULL:
@@ -2644,7 +2646,7 @@ class EpiRankMainWindow(QMainWindow):
         npos = r['npos']
         nodes_list = list(g.nodes())
         N = len(nodes_list)
-        T = traj.shape[0]
+        T = traj.shape[1]          # traj 布局为 (N, T)
 
         # 德国纬度（~51°N）用于纵横比修正
         mean_lat = float(np.mean([v[1] for v in npos.values()]))
@@ -2661,7 +2663,7 @@ class EpiRankMainWindow(QMainWindow):
         ax_a = self.fig_transient.add_subplot(gs[0, 0])
         cmap = matplotlib.colormaps.get_cmap('YlOrRd')
         for rank, idx in enumerate(order):
-            ax_a.plot(np.arange(T), traj[:, idx],
+            ax_a.plot(np.arange(T), traj[idx, :],
                       color=cmap(1.0 - rank / top_k),
                       linewidth=0.8, alpha=0.75)
         ax_a.set_xlabel('iteration (day)', fontsize=9)
