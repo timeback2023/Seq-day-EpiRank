@@ -8,15 +8,16 @@
     python build_tables.py --inplace    # 直接覆盖 EpiRank_Germany 下的原表（危险）
 
 表格 → 原始数据来源
-    Flu.xlsx        <- flu/cases.csv                                   （后 312 个周列求和）
+    flu.xlsx        <- flu/cases.csv                                   （ISO 2015-2019 共 261 周求和）
     ev.xlsx         <- germany_enterovirus_county_weekly.csv           （全量按县求和）
-    nv.xlsx         <- norovirus_germany_county_2015_2020_raw.csv      （发病率 × 人口 / 1e5）
+nv.xlsx        <- norovirus_germany_county_2015_2020_raw.csv      （2015-2019 共 5 年发病率 × 人口 / 1e5）
     cn.xlsx         <- OD/trip_count_matrix_..._2024.csv               （4 维聚合为 400×400）
     bs.xlsx         <- OD/Merging_List_Districts.csv + cn.xlsx         （县名/人口为外部来源）
     COVID-19.xlsx   <- SARS-CoV-2-.../Aktuell_...csv                   （本地为 Git-LFS 指针，不可重建）
 """
 
 import argparse
+import datetime as dt
 import os
 import sys
 
@@ -31,17 +32,28 @@ DROPPED_AGS = 16056          # Eisenach：2019/2021 起并入 Wartburgkreis(1606
 BERLIN_AGS = 11000
 BERLIN_DISTRICTS = range(11001, 11013)   # RKI 把柏林拆成 12 个 "县"
 UNKNOWN_AGS = '?????'        # RKI 的 Unbekannt（区县未知）行
-FLU_WEEKS = 312              # cases.csv 1036 个周列中取末尾 312 列
-NV_YEARS = [2015, 2016, 2017, 2018, 2019, 2020]
-NV_POP_FALLBACK = {2020: 2019}    # population.csv 无 2020 列，2020 沿用 2019
+
+# ---- flu/cases.csv 的周窗口 -------------------------------------------------
+# 周列没有日期表头，日历锚点由季节形态推定：全序列最高峰 x897 = 2017/18 大流行季
+# （峰值 2018 年第 10 周），据此得 x1 = 2001-01-01（周一）、x1036 = 2020-11-02。
+# 依据与交叉验证见 数据说明.md 第 2 节。
+FLU_X1 = dt.date(2001, 1, 1)         # 第 1 个周列的周一日期
+FLU_START = dt.date(2014, 12, 29)    # ISO 2015-W01 的周一
+FLU_END = dt.date(2019, 12, 29)      # ISO 2019-W52 的周日（含当日）
+FLU_COL0 = (FLU_START - FLU_X1).days // 7        # 0-based 起始列 = 730 → x731
+FLU_COL1 = (FLU_END - FLU_X1).days // 7 + 1      # 0-based 结束列 = 991 → x991
+FLU_WEEKS = FLU_COL1 - FLU_COL0                  # 261 周 = 5.00 年
+assert FLU_WEEKS == 261 and FLU_COL1 <= 1036
+
+NV_YEARS = [2015, 2016, 2017, 2018, 2019]
 
 SHEETS = {
     'bs.xlsx': 'Sheet1',
     'cn.xlsx': '353C',
     'COVID-19.xlsx': '2003',
     'ev.xlsx': '2010_2015',
-    'Flu.xlsx': '2015_2020',
-    'nv.xlsx': '2015_2020',
+    'flu.xlsx': '2015_2019',
+    'nv.xlsx': '2015_2019',
 }
 
 
@@ -130,16 +142,19 @@ def build_bs(canon, cn_matrix, labels):
     return bs
 
 
-# ---------------------------------------------------------------- Flu.xlsx
+# ---------------------------------------------------------------- flu.xlsx
 def build_flu():
     """flu/cases.csv：401 行（= 400 县 + Eisenach）× 1036 个周列，无表头日期。
 
-    取前 400 行（与规范行序一致，Eisenach 落在被丢弃的第 401 行）、
-    末尾 312 个周列求和。
+    按日历取 ISO 年 2015–2019：x731 … x991 共 261 周（5.00 年），
+    即 2014-12-29（2015-W01 周一）… 2019-12-29（2019-W52 周日）。
+    含 5 个流感季峰值（2015-W09 / 2016-W11 / 2017-W06 / 2018-W10 / 2019-W08），
+    不含 2019/20 季（峰在 2020-W10，已被截掉）。
+    行取前 400（与规范行序一致，Eisenach 落在被丢弃的第 401 行）。
     """
     c = pd.read_csv(os.path.join(RAW, 'flu', 'cases.csv'))
     assert c.shape == (N_COUNTY + 1, 1036), c.shape
-    return c.iloc[:N_COUNTY, -FLU_WEEKS:].sum(axis=1).to_numpy(dtype=np.int64)
+    return c.iloc[:N_COUNTY, FLU_COL0:FLU_COL1].sum(axis=1).to_numpy(dtype=np.int64)
 
 
 # ---------------------------------------------------------------- ev.xlsx
@@ -163,11 +178,13 @@ def build_ev(canon):
 def build_nv(canon, pop):
     """norovirus_..._raw.csv：412 地区 × 6 年的**年发病率**（/10 万），不是病例数。
 
+    只取 NV_YEARS（2015–2019 共 5 年），2020 年整年丢弃。
     病例数 = Σ_年 发病率 × 当年人口 / 100000，四舍五入到整数。
     柏林 12 区先取「同一年 12 个区的发病率简单平均」再乘柏林总人口
     （population.csv 只有 11000，没有分区人口）。
     """
     nv = pd.read_csv(os.path.join(RAW, 'norovirus_germany_county_2015_2020_raw.csv'))
+    nv = nv[nv['year'].isin(NV_YEARS)].copy()
     canon_index = {a: i for i, a in enumerate(canon['AGS num'])}
     nv['ags'] = rki_ags(nv)
     nv = nv[nv['ags'] != UNKNOWN_AGS].copy()
@@ -180,16 +197,16 @@ def build_nv(canon, pop):
 
     nv['row'] = [rki_ags_to_canon(a, canon_index) for a in nv['ags']]
     nv = nv.dropna(subset=['row'])
-    # 人口按 AGS 查表；2020 无列，回退到 2019
+    # 人口按 AGS 查表；NV_YEARS 全部在 population.csv 的 2000–2019 列内，无回退
     ags_int = nv['ags'].map(lambda s: BERLIN_AGS if int(s) in BERLIN_DISTRICTS else int(s))
     nv['population'] = [
-        float(pop.loc[a, str(NV_POP_FALLBACK.get(int(y), int(y)))])
+        float(pop.loc[a, str(int(y))])
         for a, y in zip(ags_int, nv['year'])
     ]
     nv['cases'] = nv['incidence'] * nv['population'] / 100000.0
 
     out = np.zeros(N_COUNTY, dtype=np.float64)
-    # 缺失年份（Hof 2016、Kempten 2016/17/19/20）incidence 为 NaN → 该县-年贡献 0
+    # 缺失年份（Hof 2016、Kempten 2016/17/19）incidence 为 NaN → 该县-年贡献 0
     np.add.at(out, nv['row'].to_numpy(dtype=int),
               nv['cases'].fillna(0.0).to_numpy())
     return np.rint(out).astype(np.int64)
@@ -279,7 +296,7 @@ def verify(rebuilt):
               f'A 列 seq=0..399, 行块 = 第 6..405 行, 列块 = 第 6..405 列')
         results['cn 版式'] = seq_ok
     # 疾病表：county/town/cases
-    for name in ['Flu.xlsx', 'ev.xlsx', 'nv.xlsx', 'COVID-19.xlsx']:
+    for name in ['flu.xlsx', 'ev.xlsx', 'nv.xlsx', 'COVID-19.xlsx']:
         want = _read_target(name)
         got = rebuilt[name]
         if got is None:
@@ -334,7 +351,8 @@ def main():
     print(f'[2/6] cn  : 400x400, 出行 {int((cn_matrix>0).sum())} 条, 总量 {cn_matrix.sum():,}')
 
     flu = build_flu()
-    print(f'[3/6] Flu : 合计 {flu.sum():,} (末尾 {FLU_WEEKS} 周 x 前 400 行)')
+    print(f'[3/6] flu : 合计 {flu.sum():,} '
+          f'(ISO 2015-2019, {FLU_WEEKS} 周 x 前 400 行)')
 
     ev = build_ev(canon)
     print(f'[4/6] ev  : 合计 {ev.sum():,}, 非零县 {int((ev>0).sum())} 个')
@@ -354,7 +372,7 @@ def main():
     bs = build_bs(canon, cn_matrix, labels)
 
     rebuilt = {'bs.xlsx': bs, 'cn.xlsx': cn_matrix, 'COVID-19.xlsx': covid,
-               'ev.xlsx': ev, 'Flu.xlsx': flu, 'nv.xlsx': nv}
+               'ev.xlsx': ev, 'flu.xlsx': flu, 'nv.xlsx': nv}
     verify(rebuilt)
 
     if not args.check:

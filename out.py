@@ -15,9 +15,9 @@ from PySide6.QtGui import QFont, QColor, QBrush
 
 
 # ==================== 数据文件配置（修改这里来切换比较对象） ====================
-FOLDER_A = r'D:\Python\EpiRank\EpiRank_原_Germany'
+FOLDER_A = r'D:\Python\EpiRank\EpiRank_原'
 PREFIX_A = 'ERA_result_d_'
-FOLDER_B = r'D:\Python\EpiRank\EpiRank_改_Germany'
+FOLDER_B = r'D:\Python\EpiRank\EpiRank_改'
 PREFIX_B = 'ERA_result_seqday_d_'
 
 

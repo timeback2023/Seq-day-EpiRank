@@ -215,12 +215,12 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet=None,
                 town_data[db][KEY_NORMALIZED_DENSITY] /= max_log_d
 
 
-def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet=None,
+def build_flu_reported_cases(town_data, path='flu.xlsx', sheet=None,
                               number_of_towns=400, row_base=2):
-    """Load influenza case counts from Flu.xlsx into town_data.
+    """Load influenza case counts from flu.xlsx into town_data.
 
     Each county is matched by (county, town) name pair.
-    Source: yearly surveillance data.
+    Source: yearly surveillance data, ISO years 2015-2019 (261 weeks).
     """
     wb = load_workbook(path, data_only=True)
     s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
@@ -927,7 +927,7 @@ class ComputeWorker(QThread):
             build_basic_table_of_towns(town_data)
             self.log_message.emit(f"  Loaded {len(town_data)} towns.")
 
-            self.log_message.emit("Loading Flu reported cases (Flu.xlsx)...")
+            self.log_message.emit("Loading Flu reported cases (flu.xlsx)...")
             build_flu_reported_cases(town_data)
 
             self.log_message.emit("Loading Norovirus reported cases (nv.xlsx)...")
@@ -1521,7 +1521,7 @@ class EpiRankMainWindow(QMainWindow):
 
     def _run_computation(self):
         # Check required files
-        required = ['bs.xlsx', 'Flu.xlsx', 'nv.xlsx', 'COVID-19.xlsx', 'cn.xlsx']
+        required = ['bs.xlsx', 'flu.xlsx', 'nv.xlsx', 'COVID-19.xlsx', 'cn.xlsx']
         missing = [f for f in required if not os.path.isfile(os.path.join(self.data_dir, f))]
         if missing:
             QMessageBox.warning(self, "Missing Data Files",
