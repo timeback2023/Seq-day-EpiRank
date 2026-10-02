@@ -780,6 +780,10 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
             s = float(csum[j])
             if s > 0:
                 CN[i, j] = float(CN_T[i, j]) / s
+    # 零出边列设为自环，保持列随机性
+    for j in range(Ncount):
+        if csum[j] == 0:
+            CN[j, j] = 1.0
 
     # ── Step A3: Column-normalise OD^T → W^T (forward matrix, Eq. 3) ──
     #
@@ -810,6 +814,10 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
             s = float(osum[j])
             if s > 0:
                 CNt[i, j] = float(ODt[i, j]) / s
+    # 零出边列设为自环，保持列随机性
+    for j in range(Ncount):
+        if osum[j] == 0:
+            CNt[j, j] = 1.0
 
     # ══════════════════════════════════════════════════════════════
     # Phase B: Iterative Power Iteration (Stage 3)
