@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-从 原始数据/ 重建 EpiRank_Germany 使用的 6 个 xlsx 表格，并逐表与现有文件校验。
+从 原始数据/ 重建 EpiRank_Germany 使用的 5 个 xlsx 表格，并逐表与现有文件校验。
 
     python build_tables.py              # 重建到 原始数据/_rebuilt/ 并校验
     python build_tables.py --check      # 只校验，不写任何文件
@@ -9,7 +9,6 @@
 
 表格 → 原始数据来源
     flu.xlsx        <- flu/cases.csv                                   （ISO 2015-2019 共 261 周求和）
-    ev.xlsx         <- germany_enterovirus_county_weekly.csv           （全量按县求和）
 nv.xlsx        <- norovirus_germany_county_2015_2020_raw.csv      （2015-2019 共 5 年发病率 × 人口 / 1e5）
     cn.xlsx         <- OD/trip_count_matrix_..._2024.csv               （4 维聚合为 400×400）
     bs.xlsx         <- OD/Merging_List_Districts.csv + cn.xlsx         （县名/人口为外部来源）
@@ -51,7 +50,6 @@ SHEETS = {
     'bs.xlsx': 'Sheet1',
     'cn.xlsx': '353C',
     'COVID-19.xlsx': '2003',
-    'ev.xlsx': '2010_2015',
     'flu.xlsx': '2015_2019',
     'nv.xlsx': '2015_2019',
 }
@@ -61,7 +59,7 @@ SHEETS = {
 def load_canon():
     """400 县的规范行序 = Merging_List_Districts.csv 去掉 16056 后按 AGS 升序。
 
-    这也是 bs/cn/Flu/ev/nv/COVID 六张表共用的行序（db_ID 0..399）。
+    这也是 bs/cn/Flu/nv/COVID 五张表共用的行序（db_ID 0..399）。
     """
     m = pd.read_csv(os.path.join(RAW, 'OD', 'Merging_List_Districts.csv'), sep='\t')
     m = m[m['AGS num'] != DROPPED_AGS].sort_values('AGS num').reset_index(drop=True)
@@ -113,7 +111,7 @@ def build_bs(canon, cn_matrix, labels):
     """bs.xlsx：坐标来自 Merging_List，通勤四列来自 cn 矩阵，其余为占位常数。
 
     labels: DataFrame[county, town, population]，这三列**不在 原始数据/ 内**，
-            属外部规范名表（见 数据说明.md 第 7 节），需由已有 bs.xlsx 提供。
+            属外部规范名表（见 数据说明.md 第 6 节），需由已有 bs.xlsx 提供。
     """
     bs = pd.DataFrame({
         'db_ID': np.arange(N_COUNTY),
@@ -155,23 +153,6 @@ def build_flu():
     c = pd.read_csv(os.path.join(RAW, 'flu', 'cases.csv'))
     assert c.shape == (N_COUNTY + 1, 1036), c.shape
     return c.iloc[:N_COUNTY, FLU_COL0:FLU_COL1].sum(axis=1).to_numpy(dtype=np.int64)
-
-
-# ---------------------------------------------------------------- ev.xlsx
-def build_ev(canon):
-    """germany_enterovirus_county_weekly.csv：574 个周一日期 × 412 个地区的长表。
-
-    直接对 count 按县全时段求和（2005–2014 全为 0，实际只有 2015 年有数据）；
-    丢弃 Unbekannt，柏林 12 区归并。
-    """
-    ev = pd.read_csv(os.path.join(RAW, 'germany_enterovirus_county_weekly.csv'))
-    canon_index = {a: i for i, a in enumerate(canon['AGS num'])}
-    ev['ags'] = rki_ags(ev)
-    ev['row'] = [rki_ags_to_canon(a, canon_index) for a in ev['ags']]
-    ev = ev.dropna(subset=['row'])
-    out = np.zeros(N_COUNTY, dtype=np.int64)
-    np.add.at(out, ev['row'].to_numpy(dtype=int), ev['count'].to_numpy())
-    return out
 
 
 # ---------------------------------------------------------------- nv.xlsx
@@ -217,7 +198,7 @@ def build_covid(canon):
     """RKI Aktuell_Deutschland_SarsCov2_Infektionen.csv → 400 县累计病例数。
 
     本地该文件是 134 字节的 Git-LFS 指针（真实体积约 413 MB），无法离线重建。
-    需先 `git lfs pull`（见 数据说明.md 第 6 节），再做：
+        需先 `git lfs pull`（见 数据说明.md 第 5 节），再做：
         1. 按 NeuerFall in (0, 1) 过滤，排除 -1（冲销）行；
         2. 按 IdLandkreis 汇总 AnzahlFall；IdLandkreis 为 5 位整数，
            11001..11012（柏林 12 区）先合并成 11000；
@@ -296,7 +277,7 @@ def verify(rebuilt):
               f'A 列 seq=0..399, 行块 = 第 6..405 行, 列块 = 第 6..405 列')
         results['cn 版式'] = seq_ok
     # 疾病表：county/town/cases
-    for name in ['flu.xlsx', 'ev.xlsx', 'nv.xlsx', 'COVID-19.xlsx']:
+    for name in ['flu.xlsx', 'nv.xlsx', 'COVID-19.xlsx']:
         want = _read_target(name)
         got = rebuilt[name]
         if got is None:
@@ -344,24 +325,21 @@ def main():
 
     canon = load_canon()
     pop = load_population()
-    print(f'[1/6] 规范县表: {N_COUNTY} 行, AGS {canon["AGS num"].iloc[0]}..'
+    print(f'[1/5] 规范县表: {N_COUNTY} 行, AGS {canon["AGS num"].iloc[0]}..'
           f'{canon["AGS num"].iloc[-1]}, 已剔除 {DROPPED_AGS}')
 
     cn_matrix = build_cn(canon)
-    print(f'[2/6] cn  : 400x400, 出行 {int((cn_matrix>0).sum())} 条, 总量 {cn_matrix.sum():,}')
+    print(f'[2/5] cn  : 400x400, 出行 {int((cn_matrix>0).sum())} 条, 总量 {cn_matrix.sum():,}')
 
     flu = build_flu()
-    print(f'[3/6] flu : 合计 {flu.sum():,} '
+    print(f'[3/5] flu : 合计 {flu.sum():,} '
           f'(ISO 2015-2019, {FLU_WEEKS} 周 x 前 400 行)')
 
-    ev = build_ev(canon)
-    print(f'[4/6] ev  : 合计 {ev.sum():,}, 非零县 {int((ev>0).sum())} 个')
-
     nv = build_nv(canon, pop)
-    print(f'[5/6] nv  : 合计 {nv.sum():,} ({len(NV_YEARS)} 年发病率 x 人口 / 1e5)')
+    print(f'[4/5] nv  : 合计 {nv.sum():,} ({len(NV_YEARS)} 年发病率 x 人口 / 1e5)')
 
     covid = build_covid(canon)
-    print(f'[6/6] COVID: {"不可重建 (本地为 Git-LFS 指针)" if covid is None else covid.sum()}')
+    print(f'[5/5] COVID: {"不可重建 (本地为 Git-LFS 指针)" if covid is None else covid.sum()}')
 
     # bs 依赖 cn；county/town/population 为外部名表，从现有 bs.xlsx 取
     bs_path = os.path.join(ROOT, 'bs.xlsx')
@@ -372,7 +350,7 @@ def main():
     bs = build_bs(canon, cn_matrix, labels)
 
     rebuilt = {'bs.xlsx': bs, 'cn.xlsx': cn_matrix, 'COVID-19.xlsx': covid,
-               'ev.xlsx': ev, 'flu.xlsx': flu, 'nv.xlsx': nv}
+               'flu.xlsx': flu, 'nv.xlsx': nv}
     verify(rebuilt)
 
     if not args.check:
