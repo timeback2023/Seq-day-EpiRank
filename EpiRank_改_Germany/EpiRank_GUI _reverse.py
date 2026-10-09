@@ -1367,7 +1367,7 @@ class EpiRankMainWindow(QMainWindow):
         self.tabs.addTab(analysis_widget, "Commuter Flow")
 
         # Tab 5: 疾病频率分布
-        self.fig_disease = Figure(figsize=(12, 10), dpi=100, facecolor='white')
+        self.fig_disease = Figure(figsize=(18, 10), dpi=100, facecolor='white')
         self.canvas_disease = FigureCanvas(self.fig_disease)
         self.toolbar_disease = NavigationToolbar(self.canvas_disease, self)
         disease_widget = QWidget()
@@ -1387,7 +1387,7 @@ class EpiRankMainWindow(QMainWindow):
         self.tabs.addTab(epirank_dist_widget, "Frequency Distribution")
 
         # Tab 7: EpiRank vs 疾病
-        self.fig_epirank_vs = Figure(figsize=(12, 6), dpi=100, facecolor='white')
+        self.fig_epirank_vs = Figure(figsize=(18, 6), dpi=100, facecolor='white')
         self.canvas_epirank_vs = FigureCanvas(self.fig_epirank_vs)
         self.toolbar_epirank_vs = NavigationToolbar(self.canvas_epirank_vs, self)
         epirank_vs_widget = QWidget()
@@ -1407,7 +1407,7 @@ class EpiRankMainWindow(QMainWindow):
         self.tabs.addTab(index_comp_widget, "Index Comparison")
 
         # Tab 9: 疾病地图
-        self.fig_disease_map = Figure(figsize=(12, 6), dpi=100, facecolor='white')
+        self.fig_disease_map = Figure(figsize=(18, 6), dpi=100, facecolor='white')
         self.canvas_disease_map = FigureCanvas(self.fig_disease_map)
         self.toolbar_disease_map = NavigationToolbar(self.canvas_disease_map, self)
         disease_map_widget = QWidget()
@@ -1427,7 +1427,7 @@ class EpiRankMainWindow(QMainWindow):
         self.tabs.addTab(epirank_map_widget, "EpiRank Map")
 
         # Tab 11: EpiRank vs 疾病地图
-        self.fig_overlay_map = Figure(figsize=(12, 6), dpi=100, facecolor='white')
+        self.fig_overlay_map = Figure(figsize=(18, 6), dpi=100, facecolor='white')
         self.canvas_overlay_map = FigureCanvas(self.fig_overlay_map)
         self.toolbar_overlay_map = NavigationToolbar(self.canvas_overlay_map, self)
         overlay_map_widget = QWidget()
@@ -1835,7 +1835,7 @@ class EpiRankMainWindow(QMainWindow):
         from matplotlib.gridspec import GridSpec
 
         self.fig_disease.clear()
-        gs = GridSpec(2, 2, figure=self.fig_disease,
+        gs = GridSpec(2, 3, figure=self.fig_disease,
                       hspace=0.38, wspace=0.30,
                       left=0.08, right=0.96, top=0.94, bottom=0.08)
 
@@ -1848,6 +1848,8 @@ class EpiRankMainWindow(QMainWindow):
                               for db in db_ids], dtype=float)
         nv_cases  = np.array([town_data[db].get(KEY_NV_TOTAL_CASES, 0.0)
                               for db in db_ids], dtype=float)
+        covid_cases = np.array([town_data[db].get(KEY_COVID_TOTAL_CASES, 0.0)
+                                for db in db_ids], dtype=float)
 
         local_flows_arr = np.array(
             [g[n][n][KEY_COMMUTER_TYPE1] if g.has_edge(n, n) else 0
@@ -1866,8 +1868,10 @@ class EpiRankMainWindow(QMainWindow):
 
         flu_breaks = head_tail_breaks(flu_cases, 3)
         nv_breaks  = head_tail_breaks(nv_cases, 3)
+        covid_breaks = head_tail_breaks(covid_cases, 3)
         flu_levels = classify_by_breaks(flu_cases, flu_breaks)
         nv_levels  = classify_by_breaks(nv_cases, nv_breaks)
+        covid_levels = classify_by_breaks(covid_cases, covid_breaks)
 
         def draw_freq_dist(ax, case_values, breaks, levels, title,
                            xlabel='epidemic risk'):
@@ -1947,16 +1951,24 @@ class EpiRankMainWindow(QMainWindow):
                        '(a) frequency distribution of flu cases')
 
         ax_b = self.fig_disease.add_subplot(gs[0, 1])
+
+        ax_c2 = self.fig_disease.add_subplot(gs[0, 2])
+        draw_freq_dist(ax_c2, covid_cases, covid_breaks, covid_levels,
+                       '(c) frequency distribution of COVID-19 cases')
         draw_freq_dist(ax_b, nv_cases, nv_breaks, nv_levels,
                        '(b) frequency distribution of NV cases')
 
         ax_c = self.fig_disease.add_subplot(gs[1, 0])
         draw_inout_ratio(ax_c, log_ratios, flu_levels,
-                         '(c) in/out ratio of flu cases')
+                         '(d) in/out ratio of flu cases')
 
         ax_d = self.fig_disease.add_subplot(gs[1, 1])
         draw_inout_ratio(ax_d, log_ratios, nv_levels,
-                         '(d) in/out ratio of NV cases')
+                         '(e) in/out ratio of NV cases')
+
+        ax_f = self.fig_disease.add_subplot(gs[1, 2])
+        draw_inout_ratio(ax_f, log_ratios, covid_levels,
+                         '(f) in/out ratio of COVID-19 cases')
 
         self.canvas_disease.draw()
 
@@ -2075,7 +2087,7 @@ class EpiRankMainWindow(QMainWindow):
         from matplotlib.patches import Patch
 
         self.fig_epirank_vs.clear()
-        gs = GridSpec(1, 2, figure=self.fig_epirank_vs,
+        gs = GridSpec(1, 3, figure=self.fig_epirank_vs,
                       wspace=0.30,
                       left=0.08, right=0.95, top=0.88, bottom=0.12)
 
@@ -2093,11 +2105,15 @@ class EpiRankMainWindow(QMainWindow):
                               for db in db_ids], dtype=float)
         nv_cases = np.array([town_data[db].get(KEY_NV_TOTAL_CASES, 0.0)
                              for db in db_ids], dtype=float)
+        covid_cases = np.array([town_data[db].get(KEY_COVID_TOTAL_CASES, 0.0)
+                                for db in db_ids], dtype=float)
 
         flu_breaks = head_tail_breaks(flu_cases, 3)
         nv_breaks = head_tail_breaks(nv_cases, 3)
         flu_actual = classify_by_breaks(flu_cases, flu_breaks)
         nv_actual = classify_by_breaks(nv_cases, nv_breaks)
+        covid_breaks = head_tail_breaks(covid_cases, 3)
+        covid_actual = classify_by_breaks(covid_cases, covid_breaks)
 
         X_LEVELS = ['core-I', 'core-II', 'core-III', 'non-core']
         LEVEL_TO_X = {'C-I': 'core-I', 'C-II': 'core-II',
@@ -2163,6 +2179,9 @@ class EpiRankMainWindow(QMainWindow):
         ax_b = self.fig_epirank_vs.add_subplot(gs[0, 1])
         draw_comparison(ax_b, nv_actual, er_levels, '(b) NV case')
 
+        ax_c = self.fig_epirank_vs.add_subplot(gs[0, 2])
+        draw_comparison(ax_c, covid_actual, er_levels, '(c) COVID-19 case')
+
         legend_patches = [
             Patch(facecolor=PREDICTED_COLORS[lv], label=lv)
             for lv in X_LEVELS
@@ -2183,19 +2202,23 @@ class EpiRankMainWindow(QMainWindow):
 
         # === Table 1: Core counts by index method ===
         metrics = [
+            ('Flu', self.results['flu_case_rank']),
+            ('NV', self.results['nv_case_rank']),
+            ('COVID-19', self.results['covid_case_rank']),
             ('EpiRank', self.results['ER_rank']),
             ('PageRank', self.results['page_rank']),
             ('HITS-Hub', self.results['hub_rank']),
             ('HITS-Authority', self.results['authority_rank']),
         ]
 
-        row_labels = ['core-I', 'core-II', 'core-III', 'non-core']
-        level_to_row = {'C-I': 0, 'C-II': 1, 'C-III': 2, 'NC': 3}
+        row_labels = ['C-I 核心', 'C-II 核心', 'C-III 核心', '全部核心 (I+II+III)', 'NC 非核心']
+        level_to_row = {'C-I': 0, 'C-II': 1, 'C-III': 2, 'NC': 4}
         row_colors = [
-            QColor(255, 120, 120),
-            QColor(255, 190, 120),
-            QColor(255, 255, 150),
-            QColor(180, 230, 180),
+            QColor(255, 120, 120),   # C-I: red
+            QColor(255, 190, 120),   # C-II: orange
+            QColor(255, 255, 150),   # C-III: yellow
+            QColor(180, 230, 180),   # 全部核心: green
+            QColor(200, 200, 200),   # NC: gray
         ]
 
         self.table1_widget.setRowCount(len(row_labels))
@@ -2225,11 +2248,22 @@ class EpiRankMainWindow(QMainWindow):
                 item.setFont(QFont('Arial', 12))
                 item.setBackground(row_colors[r])
                 self.table1_widget.setItem(r, col_idx + 1, item)
+            total_core = counts['C-I'] + counts['C-II'] + counts['C-III']
+            item = QTableWidgetItem(str(total_core))
+            item.setTextAlignment(Qt.AlignCenter)
+            item.setFont(QFont('Arial', 12))
+            item.setBackground(row_colors[3])
+            self.table1_widget.setItem(3, col_idx + 1, item)
 
         self.table1_widget.resizeColumnsToContents()
         self.table1_widget.horizontalHeader().setStretchLastSection(True)
         for c in range(self.table1_widget.columnCount()):
             self.table1_widget.horizontalHeader().setSectionResizeMode(c, QHeaderView.Stretch)
+        for r in range(self.table1_widget.rowCount()):
+            self.table1_widget.setRowHeight(r, 24)
+        self.table1_widget.setFixedHeight(self.table1_widget.horizontalHeader().height()
+                                          + 24 * self.table1_widget.rowCount() + 2)
+        self.table1_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # === Remove previously added overlap tables ===
         while self.table1_layout.count() > 1:
@@ -2242,54 +2276,55 @@ class EpiRankMainWindow(QMainWindow):
         core_labels = self._compute_core_labels_dict()
         epirank_labels = core_labels.get('EpiRank', {})
 
-        overlap_headers = ['|EpiRank|', '|Disease|', '|A∩B|', '|A∪B|',
+        overlap_headers = ['|A∩B|', '|A∪B|',
                            'IoU', 'Dice', 'Cov.(EpiRank)', 'Cov.(Disease)']
 
         overlap_row_colors = [
-            QColor(255, 120, 120),
-            QColor(255, 190, 120),
-            QColor(255, 255, 150),
-            QColor(180, 230, 180),
-            QColor(200, 200, 200),
+            QColor(255, 120, 120),   # C-I: red
+            QColor(255, 190, 120),   # C-II: orange
+            QColor(255, 255, 150),   # C-III: yellow
+            QColor(180, 230, 180),   # All core: green
+            QColor(200, 200, 200),   # NC: gray
         ]
 
         diseases = [
-            ('Flu',     core_labels.get('Flu', {})),
-            ('NV',      core_labels.get('NV', {})),
+            ('Flu', core_labels.get('Flu', {})),
+            ('NV', core_labels.get('NV', {})),
             ('COVID-19', core_labels.get('COVID-19', {})),
         ]
 
-        for disease_name, dis_labels in diseases:
-            rows_data = []
-            for lvl_name, lvl_set in OVERLAP_LEVEL_SETS:
+        n_lvl = len(OVERLAP_LEVEL_SETS)
+        num_data_rows = len(diseases) * n_lvl
+        num_cols = len(overlap_headers) + 2
+        tbl = QTableWidget(num_data_rows + 1, num_cols)
+        tbl.verticalHeader().setVisible(False)
+        tbl.setEditTriggers(QTableWidget.NoEditTriggers)
+        tbl.setAlternatingRowColors(True)
+
+        for c, h in enumerate(['Disease', 'Level'] + overlap_headers):
+            item = QTableWidgetItem(h)
+            item.setFont(QFont('Arial', 9, QFont.Bold))
+            item.setBackground(QColor(230, 230, 230))
+            item.setTextAlignment(Qt.AlignCenter)
+            tbl.setItem(0, c, item)
+
+        for di_i, (disease_name, dis_labels) in enumerate(diseases):
+            for li, (lvl_name, lvl_set) in enumerate(OVERLAP_LEVEL_SETS):
+                r = di_i * n_lvl + li + 1
                 res = compute_overlap_metrics(epirank_labels, dis_labels, lvl_set)
-                rows_data.append((lvl_name, res))
 
-            num_data_rows = len(rows_data)
-            num_cols = len(overlap_headers) + 1
-            tbl = QTableWidget(num_data_rows + 1, num_cols)
-            tbl.verticalHeader().setVisible(False)
-            tbl.setEditTriggers(QTableWidget.NoEditTriggers)
-            tbl.setAlternatingRowColors(True)
+                if li == 0:
+                    d_item = QTableWidgetItem(disease_name)
+                    d_item.setFont(QFont('Arial', 10, QFont.Bold))
+                    d_item.setBackground(QColor(180, 210, 230))
+                    d_item.setTextAlignment(Qt.AlignCenter)
+                    tbl.setItem(r, 0, d_item)
+                    tbl.setSpan(r, 0, n_lvl, 1)
 
-            title_item = QTableWidgetItem(f'EpiRank({disease_name})')
-            title_item.setFont(QFont('Arial', 11, QFont.Bold))
-            title_item.setBackground(QColor(180, 210, 230))
-            title_item.setTextAlignment(Qt.AlignCenter)
-            tbl.setItem(0, 0, title_item)
-
-            for c, h in enumerate(overlap_headers):
-                item = QTableWidgetItem(h)
-                item.setFont(QFont('Arial', 9, QFont.Bold))
-                item.setBackground(QColor(230, 230, 230))
-                item.setTextAlignment(Qt.AlignCenter)
-                tbl.setItem(0, c + 1, item)
-
-            for r, (lvl_name, res) in enumerate(rows_data):
-                item = QTableWidgetItem(lvl_name)
-                item.setFont(QFont('Arial', 10, QFont.Bold))
-                item.setBackground(overlap_row_colors[r])
-                tbl.setItem(r + 1, 0, item)
+                lvl_item = QTableWidgetItem(lvl_name)
+                lvl_item.setFont(QFont('Arial', 10, QFont.Bold))
+                lvl_item.setBackground(overlap_row_colors[li])
+                tbl.setItem(r, 1, lvl_item)
 
                 iou = res['iou']
                 if iou >= 0.9:
@@ -2300,7 +2335,6 @@ class EpiRankMainWindow(QMainWindow):
                     bg = QColor(255, 210, 210)
 
                 vals = [
-                    str(res['n_a']), str(res['n_b']),
                     str(res['n_i']), str(res['n_u']),
                     f"{res['iou']:.4f}", f"{res['dice']:.4f}",
                     f"{res['cov_a']:.4f}", f"{res['cov_b']:.4f}",
@@ -2308,13 +2342,23 @@ class EpiRankMainWindow(QMainWindow):
                 for c, v in enumerate(vals):
                     cell = QTableWidgetItem(v)
                     cell.setTextAlignment(Qt.AlignCenter)
-                    if c >= 4:
+                    if c >= 2:
                         cell.setBackground(bg)
-                    tbl.setItem(r + 1, c + 1, cell)
+                    tbl.setItem(r, c + 2, cell)
 
-            for c in range(tbl.columnCount()):
-                tbl.horizontalHeader().setSectionResizeMode(c, QHeaderView.Stretch)
-            self.table1_layout.addWidget(tbl)
+        for c in range(tbl.columnCount()):
+            tbl.horizontalHeader().setSectionResizeMode(c, QHeaderView.Stretch)
+        for r in range(tbl.rowCount()):
+            tbl.setRowHeight(r, 24)
+        tbl.setFixedHeight(tbl.horizontalHeader().height() + 24 * tbl.rowCount() + 2)
+        tbl.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table1_layout.addWidget(tbl)
+
+        note = QLabel('说明：A = EpiRank，B = 疾病（Flu/NV/COVID-19）。'
+                      '|A∩B| 为两者重合的乡镇数；Cov.(EpiRank) = |A∩B|/|A|，'
+                      'Cov.(Disease) = |A∩B|/|B|。')
+        note.setWordWrap(True)
+        self.table1_layout.addWidget(note)
 
         self.table1_layout.addStretch()
 
@@ -2418,13 +2462,14 @@ class EpiRankMainWindow(QMainWindow):
         disease_info = [
             ('(a) flu case distribution', self.results['flu_case_rank']),
             ('(b) NV case distribution', self.results['nv_case_rank']),
+            ('(c) COVID-19 case distribution', self.results['covid_case_rank']),
         ]
         size_map = {'C-I': 120, 'C-II': 60, 'C-III': 30, 'NC': 10}
         legend_labels = {'NC': 'non-core', 'C-III': 'core-III',
                          'C-II': 'core-II', 'C-I': 'core-I'}
 
         for col, (title, case_dict) in enumerate(disease_info):
-            ax = self.fig_disease_map.add_subplot(1, 2, col + 1)
+            ax = self.fig_disease_map.add_subplot(1, 3, col + 1)
             vals = np.array(list(case_dict.values()))
             keys = list(case_dict.keys())
             breaks = head_tail_breaks(vals)
@@ -2538,12 +2583,13 @@ class EpiRankMainWindow(QMainWindow):
         disease_info = [
             ('(a) flu cases', self.results['flu_case_rank']),
             ('(b) NV cases', self.results['nv_case_rank']),
+            ('(c) COVID-19 cases', self.results['covid_case_rank']),
         ]
 
         from matplotlib.lines import Line2D
 
         for col, (title, case_dict) in enumerate(disease_info):
-            ax = self.fig_overlay_map.add_subplot(1, 2, col + 1)
+            ax = self.fig_overlay_map.add_subplot(1, 3, col + 1)
 
             all_vals = np.array(list(case_dict.values()))
             all_keys = list(case_dict.keys())
