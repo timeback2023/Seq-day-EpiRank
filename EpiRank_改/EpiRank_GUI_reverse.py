@@ -1114,11 +1114,13 @@ class SensitivityWorker(QThread):
             build_basic_table_of_towns(town_data)
             build_flu_reported_cases(town_data)
             build_ev_reported_cases(town_data)
+            build_sars_reported_cases(town_data)
             build_commuting_network(g, town_data)
 
             nodes = list(g.nodes())
             flu_case_rank = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_FLU_TOTAL_CASES, 0) for s in nodes}
             ev_case_rank  = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_EV_AVERAGE_CASES, 0) for s in nodes}
+            sars_case_rank = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_SARS_TOTAL_CASES, 0) for s in nodes}
 
             d_values = np.round(np.arange(0.05, 1.025, 0.05), 2)
             total = len(d_values)
@@ -1127,6 +1129,8 @@ class SensitivityWorker(QThread):
             flu_spearman = np.zeros(len(d_values))
             ev_pearson   = np.zeros(len(d_values))
             ev_spearman  = np.zeros(len(d_values))
+            sars_pearson  = np.zeros(len(d_values))
+            sars_spearman = np.zeros(len(d_values))
 
             for j, dv in enumerate(d_values):
                 er, iters, _, _, _ = compute_epidemic_risk(
@@ -1139,11 +1143,15 @@ class SensitivityWorker(QThread):
                 fs_r, _ = get_spearman_cor(er_rank, flu_case_rank)
                 ep_r, _ = get_pearson_cor(er_rank, ev_case_rank)
                 es_r, _ = get_spearman_cor(er_rank, ev_case_rank)
+                sp_r, _ = get_pearson_cor(er_rank, sars_case_rank)
+                ss_r, _ = get_spearman_cor(er_rank, sars_case_rank)
 
                 flu_pearson[j]  = fp_r
                 flu_spearman[j] = fs_r
                 ev_pearson[j]   = ep_r
                 ev_spearman[j]  = es_r
+                sars_pearson[j]  = sp_r
+                sars_spearman[j] = ss_r
 
                 self.progress.emit(j + 1, total)
                 self.log_message.emit(f"  d={dv:.2f} completed ({j+1}/{total})")
@@ -1154,6 +1162,8 @@ class SensitivityWorker(QThread):
                 'flu_spearman': flu_spearman,
                 'ev_pearson': ev_pearson,
                 'ev_spearman': ev_spearman,
+                'sars_pearson': sars_pearson,
+                'sars_spearman': sars_spearman,
                 'd_values': d_values,
             })
 
@@ -3396,10 +3406,12 @@ class EpiRankMainWindow(QMainWindow):
             ("(b) flu (Spearman's Rho)", sr['flu_spearman']),
             ("(c) EV (Pearson's R)", sr['ev_pearson']),
             ("(d) EV (Spearman's Rho)", sr['ev_spearman']),
+            ("(e) SARS (Pearson's R)", sr['sars_pearson']),
+            ("(f) SARS (Spearman's Rho)", sr['sars_spearman']),
         ]
 
         for idx, (title, values) in enumerate(matrices):
-            ax = self.fig_sensitivity.add_subplot(2, 2, idx + 1)
+            ax = self.fig_sensitivity.add_subplot(2, 3, idx + 1)
             ax.plot(d_vals, values, 'o-', color='steelblue', linewidth=1.5, markersize=4)
             ax.set_xlabel('damping factor (d)', fontsize=9)
             ax.set_ylabel('correlation', fontsize=9)

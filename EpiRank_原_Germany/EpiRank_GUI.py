@@ -1184,6 +1184,7 @@ class SensitivityWorker(QThread):
             nodes = list(g.nodes())
             flu_case_rank = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_FLU_TOTAL_CASES, 0) for s in nodes}
             nv_case_rank  = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_NV_TOTAL_CASES, 0) for s in nodes}
+            covid_case_rank = {s: town_data[g.nodes[s][KEY_DB_ID]].get(KEY_COVID_TOTAL_CASES, 0) for s in nodes}
 
             # Parameter grid
             daytime_values = np.round(np.arange(0.0, 1.05, 0.05), 2)   # 21 values
@@ -1194,6 +1195,8 @@ class SensitivityWorker(QThread):
             flu_spearman = np.zeros((len(daytime_values), len(d_values)))
             nv_pearson   = np.zeros((len(daytime_values), len(d_values)))
             nv_spearman  = np.zeros((len(daytime_values), len(d_values)))
+            covid_pearson  = np.zeros((len(daytime_values), len(d_values)))
+            covid_spearman = np.zeros((len(daytime_values), len(d_values)))
 
             count = 0
             for i, dt in enumerate(daytime_values):
@@ -1206,11 +1209,15 @@ class SensitivityWorker(QThread):
                     fs_r = get_spearman_cor(er_rank, flu_case_rank)
                     ep_r = get_pearson_cor(er_rank, nv_case_rank)
                     es_r = get_spearman_cor(er_rank, nv_case_rank)
+                    cp_r = get_pearson_cor(er_rank, covid_case_rank)
+                    cs_r = get_spearman_cor(er_rank, covid_case_rank)
 
                     flu_pearson[i, j]  = fp_r
                     flu_spearman[i, j] = fs_r
                     nv_pearson[i, j]   = ep_r
                     nv_spearman[i, j]  = es_r
+                    covid_pearson[i, j]  = cp_r
+                    covid_spearman[i, j] = cs_r
 
                     count += 1
                     self.progress.emit(count, total)
@@ -1224,6 +1231,8 @@ class SensitivityWorker(QThread):
                 'flu_spearman': flu_spearman,
                 'nv_pearson': nv_pearson,
                 'nv_spearman': nv_spearman,
+                'covid_pearson': covid_pearson,
+                'covid_spearman': covid_spearman,
                 'daytime_values': daytime_values,
                 'd_values': d_values,
             })
@@ -3446,8 +3455,9 @@ class EpiRankMainWindow(QMainWindow):
         different values of the daytime parameter and damping factor."
 
         Subplots:
-          (a) Flu Pearson's R, (b) Flu Spearman's ρ,
-          (c) NV Pearson's R,  (d) NV Spearman's ρ.
+          (a) Flu Pearson's R,   (b) Flu Spearman's ρ,
+          (c) NV Pearson's R,    (d) NV Spearman's ρ,
+          (e) COVID-19 Pearson's R,  (f) COVID-19 Spearman's ρ.
         """
         self.fig_sensitivity.clear()
 
@@ -3460,10 +3470,12 @@ class EpiRankMainWindow(QMainWindow):
             ("(b) flu (Spearman's Rho)", sr['flu_spearman']),
             ("(c) NV (Pearson's R)", sr['nv_pearson']),
             ("(d) NV (Spearman's Rho)", sr['nv_spearman']),
+            ("(e) COVID-19 (Pearson's R)", sr['covid_pearson']),
+            ("(f) COVID-19 (Spearman's Rho)", sr['covid_spearman']),
         ]
 
         for idx, (title, matrix) in enumerate(matrices):
-            ax = self.fig_sensitivity.add_subplot(2, 2, idx + 1)
+            ax = self.fig_sensitivity.add_subplot(2, 3, idx + 1)
 
             # origin='upper' so daytime 0.0 is at top, 1.0 at bottom (matching paper)
             im = ax.imshow(matrix, aspect='auto', origin='upper',
