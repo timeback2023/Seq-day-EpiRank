@@ -644,10 +644,13 @@ def _node_name(g, town_data, node):
 
 
 def _stat_line(name, values):
-    """一行统计摘要；inf/nan 不参与统计但会计数。
+    """一行统计摘要；inf/nan 不参与统计。
 
     标量（n=1，如谱特征值）没有分布可言，min/p50/mean/max 必然全都
-    等于它本身，此时只输出 n 与数值本身，避免重复 4 遍。
+    等于它本身，此时只输出 n 与数值本身。
+
+    finite 计数与 n 相等（即没有 nan/inf）时予以省略——它与 n 重复，
+    没有信息量；只有确实缺失数据时才显示，以免掩盖问题。
     """
     a = np.asarray(values, dtype=float).ravel()
     finite = a[np.isfinite(a)]
@@ -655,7 +658,8 @@ def _stat_line(name, values):
         return f"    {name:<26} n={a.size:<5} (no finite value)"
     if a.size == 1:
         return f"    {name:<26} n=1    {finite[0]:.6g}"
-    return (f"    {name:<26} n={a.size:<5} finite={finite.size:<5} "
+    fin = f" finite={finite.size}" if finite.size != a.size else ""
+    return (f"    {name:<26} n={a.size}{fin}  "
             f"min={finite.min():.6g}  p50={np.median(finite):.6g}  "
             f"mean={finite.mean():.6g}  max={finite.max():.6g}")
 
@@ -2857,10 +2861,10 @@ class EpiRankMainWindow(QMainWindow):
 
         # 叠加谱间隙/Kemeny 文本框
         info_text = (
-            f"{'abs gap |λ₂|/|λ₁|':<20} = {tm['spectral_gap']:.5f}\n"
-            f"{'Kemeny Σ 1/(1-λᵣ)':<20} = {tm['kemeny_constant']:.2f}\n"
-            f"{'|λ₁|':<20} = {tm['abs_lambda1']:.6f}\n"
-            f"{'|λ₂|':<20} = {tm['abs_lambda2']:.6f}"
+            f"{'abs gap':<7} = {tm['spectral_gap']:.5f}\n"
+            f"{'Kemeny':<7} = {tm['kemeny_constant']:.2f}\n"
+            f"{'|λ₁|':<7} = {tm['abs_lambda1']:.6f}\n"
+            f"{'|λ₂|':<7} = {tm['abs_lambda2']:.6f}"
         )
         ax_d.text(0.98, 0.97, info_text,
                   transform=ax_d.transAxes,
