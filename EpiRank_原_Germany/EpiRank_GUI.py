@@ -10,7 +10,7 @@ The EpiRank model estimates the relative epidemic risk of counties in
 Germany by combining a bidirectional commuting network with a PageRank-like
 iterative algorithm.  The core formula (Eq. 4–6 of the paper) is:
 
-    ER = (1 − d) · exFac  +  d · (daytime · W^T · ER  +  (1 − daytime) · W · ER)
+    ER = (1 − d) · exFac  +  d · (daytime · W_m · ER  +  (1 − daytime) · W_e · ER)
 
 where
     ER       = epidemic risk vector (N×1), sums to 1.0 at convergence
@@ -19,8 +19,8 @@ where
                0.0 = backward only (evening commute home → residence),
                0.5 = bidirectional (equal weight),
                1.0 = forward only (morning commute home → workplace)
-    W        = column-normalised OD (origin-destination) commuting matrix
-    W^T      = column-normalised transpose of the raw OD matrix
+    W_e      = column-normalised OD (origin-destination) commuting matrix
+    W_m      = column-normalised transpose of the raw OD matrix
     exFac    = external factor vector (default uniform 1/N)
 
 Classification uses the head/tail breaks method (Jiang 2013), recursively
@@ -586,8 +586,8 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     The raw OD matrix is column-normalised into two stochastic matrices,
     each capturing a different direction of disease transmission:
 
-        W   = col-normalise(OD)     → backward / push direction
-        W^T = col-normalise(OD^T)   → forward  / pull direction
+        W_e   = col-normalise(OD)     → backward / push direction
+        W_m = col-normalise(OD^T)   → forward  / pull direction
 
     Why column-normalisation?  Imagine county j has 3 commuting sources:
     A sends 600, B sends 300, C sends 100 commuters.  Column-normalising
@@ -602,8 +602,8 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     Starting from a uniform distribution (every county equally risky),
     the algorithm repeatedly applies:
 
-        ER(t+1) = (1-d) · (1/N)  +  d · [daytime · W^T · ER(t)
-                                       + (1-daytime) · W  · ER(t)]
+        ER(t+1) = (1-d) · (1/N)  +  d · [daytime · W_m · ER(t)
+                                       + (1-daytime) · W_e  · ER(t)]
 
     Intuition for each term:
     ┌──────────────────────┬─────────────────────────────────────────┐
@@ -615,18 +615,18 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     │                      │ This prevents isolated islands from     │
     │                      │ having zero risk.                       │
     ├──────────────────────┼─────────────────────────────────────────┤
-    │ d · daytime · W^T·ER │ Forward (morning) commute contribution: │
+    │ d · daytime · W_m·ER │ Forward (morning) commute contribution: │
     │                      │ commuters ARRIVE at their workplaces,   │
     │                      │ carrying risk FROM their home counties. │
-    │                      │ W^T propagates risk in the direction    │
+    │                      │ W_m propagates risk in the direction    │
     │                      │ home → work.  High-risk counties that   │
     │                      │ SEND many workers raise the risk of     │
     │                      │ the destination (pull effect).          │
     ├──────────────────────┼─────────────────────────────────────────┤
-    │ d·(1-daytime)· W·ER  │ Backward (evening) commute contribution:│
+    │ d·(1-daytime)·W_e·ER │ Backward (evening) commute contribution:│
     │                      │ commuters RETURN to their residences,   │
     │                      │ carrying risk FROM their workplaces.    │
-    │                      │ W propagates risk in the direction      │
+    │                      │ W_e propagates risk in the direction    │
     │                      │ work → home.  High-risk workplaces push │
     │                      │ disease back to the bedroom suburbs     │
     │                      │ (push effect).                          │
@@ -726,7 +726,7 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
         by ``list(g.nodes())``).
     iterations : int
         Actual number of iterations performed before convergence.
-    CN_C : np.ndarray, shape (N, N)
+    OD : np.ndarray, shape (N, N)
         The raw (un-normalised) OD commuting count matrix.  Returned for
         use in downstream analyses (e.g. commuter flow statistics).
     """
@@ -738,7 +738,7 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
 
     # ── Step A1: Extract the raw OD matrix from the graph (Eq. 1) ──
     #
-    # CN_C[i,j] = number of commuters from node i to node j.
+    # OD[i,j] = number of commuters from node i to node j.
     #
     # The row/column ordering follows list(g.nodes()) — the insertion
     # order of nodes in the DiGraph, preserved by nx.to_numpy_array().
@@ -751,8 +751,7 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     #         B   [ 150  600  100 ]
     #         C   [  30   80  500 ]]
     #
-    CN_C = nx.to_numpy_array(g, weight=KEY_COMMUTER_TYPE1)
-    CN_T = CN_C.copy()
+    OD = nx.to_numpy_array(g, weight=KEY_COMMUTER_TYPE1)
 
     # ── Step A2: Column-normalise OD → W (backward matrix, Eq. 2) ──
     #
@@ -763,7 +762,7 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     # at county j came from county i.
     #
     # W models the *backward* (evening) commuting pattern.  When we
-    # multiply W · ER, county j's risk "flows back" to all the home
+# multiply W_e · ER, county j's risk "flows back" to all the home
     # counties i in proportion to their commuter share.  This captures
     # the scenario: a worker gets infected at workplace j, then carries
     # the pathogen home to residence i.
@@ -773,51 +772,51 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     #   W[:,B] = [200/880, 600/880, 80/880] = [0.227, 0.682, 0.091]
     #   → 68.2% of B's "backward risk" stays local, 22.7% flows to A
     #
-    csum = CN_T.sum(axis=0)
-    CN = np.zeros((Ncount, Ncount))
-    for i in range(CN_T.shape[0]):
-        for j in range(CN_T.shape[1]):
+    csum = OD.sum(axis=0)
+    W_e = np.zeros((Ncount, Ncount))
+    for i in range(OD.shape[0]):
+        for j in range(OD.shape[1]):
             s = float(csum[j])
             if s > 0:
-                CN[i, j] = float(CN_T[i, j]) / s
+                W_e[i, j] = float(OD[i, j]) / s
     # 零出边列设为自环，保持列随机性
     for j in range(Ncount):
         if csum[j] == 0:
-            CN[j, j] = 1.0
+            W_e[j, j] = 1.0
 
-    # ── Step A3: Column-normalise OD^T → W^T (forward matrix, Eq. 3) ──
+    # ── Step A3: Column-normalise OD^T → W_m (forward matrix, Eq. 3) ──
     #
     # First transpose the raw OD matrix, then column-normalise.
-    # CNt = col-normalise(OD^T)
+    # W_m = col-normalise(OD^T)
     #
-    # Interpretation: CNt[j,i] is the probability that a commuter
+    # Interpretation: W_m[j,i] is the probability that a commuter
     # leaving home county i goes to workplace county j.
     #
-    # CNt models the *forward* (morning) commuting pattern.  When we
-    # multiply CNt · ER, county i's risk "flows forward" to all the
+    # W_m models the *forward* (morning) commuting pattern.  When we
+    # multiply W_m · ER, county i's risk "flows forward" to all the
     # workplaces j that its residents commute to.  This captures the
     # scenario: infected residents of county i carry the pathogen
     # to their various workplaces.
     #
-    # Key asymmetry: W and CNt generally produce DIFFERENT risk rankings.
+    # Key asymmetry: W and W_m generally produce DIFFERENT risk rankings.
     # A large bedroom suburb (many outgoing commuters) will have high
     # risk under the backward model (W) because workers bring disease
     # home.  A city-centre business district (many incoming commuters)
-    # will have high risk under the forward model (CNt) because it
+    # will have high risk under the forward model (W_m) because it
     # attracts infected commuters from many sources.
     #
-    ODt = CN_T.T
-    osum = ODt.sum(axis=0)
-    CNt = np.zeros((Ncount, Ncount))
-    for i in range(ODt.shape[0]):
-        for j in range(ODt.shape[1]):
+    OD_T = OD.T
+    osum = OD_T.sum(axis=0)
+    W_m = np.zeros((Ncount, Ncount))
+    for i in range(OD_T.shape[0]):
+        for j in range(OD_T.shape[1]):
             s = float(osum[j])
             if s > 0:
-                CNt[i, j] = float(ODt[i, j]) / s
+                W_m[i, j] = float(OD_T[i, j]) / s
     # 零出边列设为自环，保持列随机性
     for j in range(Ncount):
         if osum[j] == 0:
-            CNt[j, j] = 1.0
+            W_m[j, j] = 1.0
 
     # ══════════════════════════════════════════════════════════════
     # Phase B: Iterative Power Iteration (Stage 3)
@@ -839,17 +838,17 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
 
     # ── Step B2: Iterate until convergence (Eq. 4) ──
     #
-    #   ER(t+1) = (1-d) · exFac  +  d · [ daytime   · CNt · ER(t)    ← forward
-    #                                    + (1-daytime) · CN · ER(t) ]  ← backward
+    #   ER(t+1) = (1-d) · exFac  +  d · [ daytime   · W_m · ER(t)    ← forward
+    #                                    + (1-daytime) · W_e · ER(t) ]  ← backward
     #
     # This is a power iteration on a modified stochastic matrix.  At
     # each step, the new risk of county i is a weighted blend of:
     #   1. A uniform "teleportation" baseline              [(1-d)/N]
-    #   2. Risk propagated forward through morning commute [d·daytime·CNt·ER]
-    #   3. Risk propagated backward through evening return [d·(1-daytime)·CN·ER]
+    #   2. Risk propagated forward through morning commute [d·daytime·W_m·ER]
+    #   3. Risk propagated backward through evening return [d·(1-daytime)·W_e·ER]
     #
     # Convergence guarantee:
-    #   CN (W) and CNt (W') are column-stochastic; their convex combo
+    #   W_e (W) and W_m (W') are column-stochastic; their convex combo
     #   P is too.  Adding (1-d)·e makes M = (1-d)·E + d·P strictly
     #   positive.  By Perron-Frobenius: unique λ₁=1, all |λᵢ|<1,
     #   so power iteration converges to the unique stationary vector.
@@ -857,7 +856,7 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     #   (Full proof: see docstring section "Why is EpiRank guaranteed
     #    to converge?" above.)
     #
-    #   CN (W) and CNt (W') are column-stochastic; their convex combo
+    #   W_e (W) and W_m (W') are column-stochastic; their convex combo
     #   P is too.  Adding (1-d)·e makes M = (1-d)·E + d·P strictly
     #   positive.  By Perron-Frobenius: unique λ₁=1, all |λᵢ|<1,
     #   so power iteration converges to the unique stationary vector.
@@ -875,8 +874,8 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     for i in range(number_of_loops):
         old_er = epidemic_risk.copy()
         epidemic_risk = ((1.0 - d) * other_factors +
-                         d * (daytime * (CNt @ epidemic_risk) +
-                              (1.0 - daytime) * (CN @ epidemic_risk)))
+                         d * (daytime * (W_m @ epidemic_risk) +
+                              (1.0 - daytime) * (W_e @ epidemic_risk)))
         iterations = i + 1
 
         # 收敛判据用显式无穷范数。np.allclose 的实际容差是
@@ -894,7 +893,7 @@ def compute_epidemic_risk(g, town_data, d, daytime, number_of_loops=5000,
     # Higher values indicate that the county sits at a critical hub
     # in the commuting network for disease transmission.
 
-    return epidemic_risk, iterations, CN_C
+    return epidemic_risk, iterations, OD
 
 
 # ============================================================
@@ -950,7 +949,7 @@ class ComputeWorker(QThread):
 
             # ── Stage 2: Compute EpiRank (main run) ──
             self.log_message.emit(f"Computing EpiRank (d={self.d}, daytime={self.daytime}, max_loops={self.max_loops})...")
-            epidemic_risk, iterations, CN_C = compute_epidemic_risk(
+            epidemic_risk, iterations, OD = compute_epidemic_risk(
                 g, town_data, self.d, self.daytime, self.max_loops,
                 progress_callback=lambda cur, mx: self.progress.emit(cur, mx)
             )
@@ -1121,7 +1120,7 @@ class ComputeWorker(QThread):
                 'covid_case_rank': covid_case_rank,
                 'pop_rank': pop_rank,
                 'iterations': iterations,
-                'CN_C': CN_C,
+                'OD': OD,
                 'npos': npos,
                 'd': self.d,
                 'daytime': self.daytime,

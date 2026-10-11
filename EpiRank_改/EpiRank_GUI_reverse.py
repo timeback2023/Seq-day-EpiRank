@@ -5,15 +5,15 @@ EpiRank GUI — Epidemic Risk Analysis System (PySide6)
 Reverse Sequential-day 版本：一天一次迭代，日内先晚后早传播，日末只加一次外部因子。
 
 核心公式：
-    ER_{t+1} = (1-d)·e + d · W^T · W · ER_t
+    ER_{t+1} = (1-d)·exFac + d · W_m · W_e · ER_t
 
 其中：
-    W   = 回程（evening）方向列归一化 OD 矩阵
-    W^T = 去程（morning）方向列归一化转置 OD 矩阵
-    e   = 均匀外部因子 (1/N)
-    d   = 阻尼系数
+    W_e   = 回程（evening）方向列归一化 OD 矩阵
+    W_m   = 去程（morning）方向列归一化转置 OD 矩阵
+    exFac = 均匀外部因子 (1/N)
+    d     = 阻尼系数
 
-收敛性由 Perron-Frobenius 定理保证（M_day = (1-d)E + d·W^T·W 严格正、列随机）。
+收敛性由 Perron-Frobenius 定理保证（M_day = (1-d)E + d·W_m·W_e 严格正、列随机）。
 分类使用 head/tail breaks (Jiang 2013)。
 
 Note: 无 daytime 参数。一天只有一个 EpiRank 结果。
@@ -404,9 +404,9 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
     """Reverse Sequential-day EpiRank 核心（M1 瞬态 + M2 归因）。
 
     日内先晚后早，日末只加一次外部因子：
-        ER_{t+1} = (1-d)·e + d · W^T · (W · ER_t)
+        ER_{t+1} = (1-d)·exFac + d · W_m · (W_e · ER_t)
 
-    收敛性：M_day = (1-d)E + d·W^T·W 严格正、列随机。
+    收敛性：M_day = (1-d)E + d·W_m·W_e 严格正、列随机。
 
     Parameters
     ----------
@@ -418,33 +418,32 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
     Ncount = g.order()
 
     # ---- Phase A: 建立并列归一化 OD 矩阵 ----
-    CN_C = nx.to_numpy_array(g, weight=KEY_COMMUTER_TYPE1)
-    CN_T = CN_C.copy()
+    OD = nx.to_numpy_array(g, weight=KEY_COMMUTER_TYPE1)
 
-    csum = CN_T.sum(axis=0)
-    CN = np.zeros((Ncount, Ncount))
-    for i in range(CN_T.shape[0]):
-        for j in range(CN_T.shape[1]):
+    csum = OD.sum(axis=0)
+    W_e = np.zeros((Ncount, Ncount))
+    for i in range(OD.shape[0]):
+        for j in range(OD.shape[1]):
             s = float(csum[j])
             if s > 0:
-                CN[i, j] = float(CN_T[i, j]) / s
+                W_e[i, j] = float(OD[i, j]) / s
     # 零出边列设为自环，保持列随机性
     for j in range(Ncount):
         if csum[j] == 0:
-            CN[j, j] = 1.0
+            W_e[j, j] = 1.0
 
-    ODt = CN_T.T
-    osum = ODt.sum(axis=0)
-    CNt = np.zeros((Ncount, Ncount))
-    for i in range(ODt.shape[0]):
-        for j in range(ODt.shape[1]):
+    OD_T = OD.T
+    osum = OD_T.sum(axis=0)
+    W_m = np.zeros((Ncount, Ncount))
+    for i in range(OD_T.shape[0]):
+        for j in range(OD_T.shape[1]):
             s = float(osum[j])
             if s > 0:
-                CNt[i, j] = float(ODt[i, j]) / s
+                W_m[i, j] = float(OD_T[i, j]) / s
     # 零出边列设为自环，保持列随机性
     for j in range(Ncount):
         if osum[j] == 0:
-            CNt[j, j] = 1.0
+            W_m[j, j] = 1.0
 
     # ---- Phase B: Reverse Sequential-day 迭代 ----
     other_factors = np.ones((Ncount, 1)) / float(Ncount)
@@ -459,16 +458,16 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
         old_er = epidemic_risk.copy()
 
         # 第一阶段：Evening
-        er_evening = CN @ epidemic_risk
+        er_evening = W_e @ epidemic_risk
 
         if record_attribution:
-            F_evening += CN * epidemic_risk.T
+            F_evening += W_e * epidemic_risk.T
 
         # 第二阶段：Morning
-        morning_contrib = CNt @ er_evening
+        morning_contrib = W_m @ er_evening
 
         if record_attribution:
-            F_morning += CNt * er_evening.T
+            F_morning += W_m * er_evening.T
 
         # 日末加入外部因子
         epidemic_risk = (
@@ -529,7 +528,7 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
                 velocity[i] = np.polyfit(t_axis, y, 1)[0]
 
         E_uniform = np.ones((N, N)) / float(N)
-        M_day = (1.0 - d) * E_uniform + d * (CNt @ CN)
+        M_day = (1.0 - d) * E_uniform + d * (W_m @ W_e)
         eigvals = np.linalg.eigvals(M_day)
 
         # ---- 绝对谱隙（保留，用于混合速度报告）----
@@ -582,7 +581,7 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
 
         # ── 闭式解校验 ──
         I = np.eye(Ncount)
-        A = I - d * (CNt @ CN)
+        A = I - d * (W_m @ W_e)
         try:
             er_star_closed = np.linalg.solve(A, (1.0 - d) * other_factors)
             er_star_closed = er_star_closed.flatten()
@@ -618,7 +617,7 @@ def compute_epidemic_risk(g, town_data, d, number_of_loops=5000,
             'er_star_closed': er_star_closed,
         }
 
-    return epidemic_risk, iterations, CN_C, transient_metrics, attribution_data
+    return epidemic_risk, iterations, OD, transient_metrics, attribution_data
 
 
 # ============================================================
@@ -645,11 +644,17 @@ def _node_name(g, town_data, node):
 
 
 def _stat_line(name, values):
-    """一行统计摘要；inf/nan 不参与统计但会计数。"""
+    """一行统计摘要；inf/nan 不参与统计但会计数。
+
+    标量（n=1，如谱特征值）没有分布可言，min/p50/mean/max 必然全都
+    等于它本身，此时只输出 n 与数值本身，避免重复 4 遍。
+    """
     a = np.asarray(values, dtype=float).ravel()
     finite = a[np.isfinite(a)]
     if finite.size == 0:
         return f"    {name:<26} n={a.size:<5} (no finite value)"
+    if a.size == 1:
+        return f"    {name:<26} n=1    {finite[0]:.6g}"
     return (f"    {name:<26} n={a.size:<5} finite={finite.size:<5} "
             f"min={finite.min():.6g}  p50={np.median(finite):.6g}  "
             f"mean={finite.mean():.6g}  max={finite.max():.6g}")
@@ -736,10 +741,10 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
                      'Kemeny = Σ_{r≥2} 1/(1-λ_r) 用到完整谱）')
         lines.append(_stat_line('abs(lambda1)', [tm['abs_lambda1']]))
         lines.append(_stat_line('abs(lambda2)', [tm['abs_lambda2']]))
-        lines.append(f"    {'abs_spectral_gap 1-|l2|/|l1|':<26} "
+        lines.append(f"    {'abs_spectral_gap':<26} "
                      f"{tm['spectral_gap']:.6g}")
         kem = tm['kemeny_constant']
-        lines.append(f"    {'kemeny_constant sum 1/(1-lr)':<26} "
+        lines.append(f"    {'kemeny_constant':<26} "
                      f"{'inf' if not np.isfinite(kem) else format(kem, '.6g')}")
         lines.append('')
 
@@ -747,18 +752,14 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         lines.append(f'  轨迹 trajectory  shape={traj.shape}')
         lines.append(f"    {'t=0 sum':<26} {traj[:, 0].sum():.10f}")
         lines.append(f"    {'t=T-1 sum':<26} {traj[:, -1].sum():.10f}")
-        er_star = np.asarray(tm['er_star'], dtype=float)
-
-        # er_star 本身就是 traj[:, -1]，两者相减恒为 0，没有信息量。
-        # 真正有意义的是「迭代解 vs 闭式解」的偏差，故取 M2 的
-        # er_star_closed；未记录归因数据（或闭式解求解失败）时标 N/A。
-        er_star_closed = (attribution_data or {}).get('er_star_closed')
-        if er_star_closed is not None:
-            dev = np.abs(np.asarray(er_star_closed, dtype=float) - er_star)
-            lines.append(f"    {'max|ER_iter-ER_closed|':<26} "
-                         f"{dev.max():.6g}")
+        # closed_form_residual = max|ER_iter - ER_closed|，即闭式解与迭代解的
+        # 最大逐元素偏差，是迭代收敛正确性的直接度量，故归入 M1。
+        # 未记录归因数据（或闭式解求解失败）时标 N/A。
+        if (attribution_data or {}).get('er_star_closed') is not None:
+            lines.append(f"    {'closed_form_residual':<26} "
+                         f"{attribution_data['closed_form_residual']:.3e}")
         else:
-            lines.append(f"    {'max|ER_iter-ER_closed|':<26} "
+            lines.append(f"    {'closed_form_residual':<26} "
                          f'N/A (需 record_attribution=True)')
         if T <= LOG_TRAJ_FULL:
             rows = list(range(T))
@@ -787,8 +788,6 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         ht_stat = ht[~unchanged]
         lines.append(_stat_line('Af_i', ht_stat))
         lines.append(f"    {'excluded (ER*≈ER0)':<26} {int(unchanged.sum())}")
-        lines.append(f"    {'never reached (nan)':<26} "
-                     f"{int(np.isnan(ht_stat).sum())}")
 
         # 排名同样排除 unchanged：置 nan，由 _append_rank_table 自动跳过
         ht_rank = ht.copy()
@@ -815,29 +814,26 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         ad = attribution_data
         lines.append('[M2] 方向性风险归因')
         lines.append('')
-        lines.append(f"    {'closed_form_residual':<26} "
-                     f"{ad['closed_form_residual']:.3e}")
-        lines.append('')
 
-        # 净流入 / 净流出
+        # 累计流入 / 累计流出
         n_in = np.asarray(ad['net_inflow'], dtype=float)
         n_out = np.asarray(ad['net_outflow'], dtype=float)
-        lines.append('  净流入 net_inflow  (F_net 按行汇总 = 流入本县的风险)')
+        lines.append('  累计流入 net_inflow  (F_net 按行汇总 = 流入本县的风险)')
         lines.append(_stat_line('net_inflow', n_in))
-        lines.append('  净流出 net_outflow (F_net 按列汇总 = 本县流出的风险)')
+        lines.append('  累计流出 net_outflow (F_net 按列汇总 = 本县流出的风险)')
         lines.append(_stat_line('net_outflow', n_out))
         bal = n_in - n_out
-        lines.append(f"    {'净流入-净流出':<26} "
+        lines.append(f"    {'累计流入-累计流出':<26} "
                      f"sum={bal.sum():.6g}  mean={bal.mean():.6g}  "
                      f"max={bal.max():.6g}  min={bal.min():.6g}")
         lines.append('')
-        _append_rank_table(lines, f'  净流入最高 top {top_n}:',
+        _append_rank_table(lines, f'  累计流入最高 top {top_n}:',
                            nodes, g, town_data, n_in, largest=True, top_n=top_n)
-        _append_rank_table(lines, f'  净流出最高 top {top_n}:',
+        _append_rank_table(lines, f'  累计流出最高 top {top_n}:',
                            nodes, g, town_data, n_out, largest=True, top_n=top_n)
-        _append_rank_table(lines, f'  净流入-净流出最高 top {top_n} (净接收者):',
+        _append_rank_table(lines, f'  累计流入-累计流出最高 top {top_n} (净接收者):',
                            nodes, g, town_data, bal, largest=True, top_n=top_n)
-        _append_rank_table(lines, f'  净流入-净流出最低 top {top_n} (净输出者):',
+        _append_rank_table(lines, f'  累计流入-累计流出最低 top {top_n} (净输出者):',
                            nodes, g, town_data, bal, largest=False, top_n=top_n)
 
         # 风险流矩阵
@@ -854,7 +850,7 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         # 风险来源归属（每个县列出贡献最大的若干来源县）
         top_sources = ad['top_sources']
         order = np.argsort(-n_in, kind='stable')[:top_n]
-        lines.append(f'  风险来源归属（按净流入排序的前 {len(order)} 个县，'
+        lines.append(f'  风险来源归属（按累计流入排序的前 {len(order)} 个县，'
                      f'每县列出前 {5} 个来源）')
         for rank, i in enumerate(order, 1):
             i = int(i)
@@ -917,7 +913,7 @@ class ComputeWorker(QThread):
             # 主计算
             self.log_message.emit(
                 f"Computing Reverse Sequential-day EpiRank (d={self.d}, max_loops={self.max_loops})...")
-            (epidemic_risk, iterations, CN_C,
+            (epidemic_risk, iterations, OD,
              transient_metrics, attribution_data) = compute_epidemic_risk(
                 g, town_data, self.d, self.max_loops,
                 progress_callback=lambda cur, mx: self.progress.emit(cur, mx),
@@ -1070,7 +1066,7 @@ class ComputeWorker(QThread):
                 'sars_case_rank': sars_case_rank,
                 'pop_rank': pop_rank,
                 'iterations': iterations,
-                'CN_C': CN_C,
+                'OD': OD,
                 'npos': npos,
                 'd': self.d,
                 'transient_metrics': transient_metrics,
@@ -2773,13 +2769,10 @@ class EpiRankMainWindow(QMainWindow):
                              edgecolors='black', linewidths=0.4,
                              zorder=4)
 
-            # 修改.md 原文写作 (~valid_mask).sum() - unchanged.sum()，
-            # 但 unchanged 的 Af 有限(=0)，与 nan 集合不相交，故直接计 nan
-            n_inf = int((~np.isfinite(half_time)).sum())
             n_unc = int(unchanged.sum())
             ax_b.set_title(
                 f'(b) half-way adjustment time Af_i\n'
-                f'[{n_unc} unchanged (gray), {n_inf} N/A]',
+                f'[{n_unc} unchanged (gray)]',
                 fontsize=10)
         else:
             ax_b.set_title('(b) half-way adjustment — no finite values',
@@ -2881,7 +2874,7 @@ class EpiRankMainWindow(QMainWindow):
 
     # ---- Tab 15: Attribution（M2）----
     def _draw_attribution(self):
-        """M2 方向性风险归因：净流入/流出、边流量矩阵、top-k 源、闭式校验。"""
+        """M2 方向性风险归因：净流入/流出、边流量矩阵、top-k 源。"""
         self.fig_attribution.clear()
 
         r = self.results
@@ -2904,7 +2897,6 @@ class EpiRankMainWindow(QMainWindow):
         net_in = ad['net_inflow']
         net_out = ad['net_outflow']
         top_sources = ad['top_sources']
-        residual = ad['closed_form_residual']
 
         # 县名（用于标注）
         def label_of(i):
@@ -3000,7 +2992,7 @@ class EpiRankMainWindow(QMainWindow):
         ax_c.tick_params(axis='x', labelsize=7)
         ax_c.grid(True, alpha=0.2, axis='x')
 
-        # ── (d) 净流入地图 + 闭式校验 ──
+        # ── (d) 净流入地图 ──
         ax_d = self.fig_attribution.add_subplot(gs[1, 1])
         # 背景节点（浅灰）
         all_x = [npos[k][0] for k in nodes_list if k in npos]
@@ -3024,16 +3016,6 @@ class EpiRankMainWindow(QMainWindow):
         ax_d.set_aspect('equal')
         ax_d.axis('off')
         ax_d.set_title('(d) net inflow map', fontsize=10)
-
-        # 闭式校验文本框
-        info_text = f"closed-form residual = {residual:.3e}"
-        ax_d.text(0.02, 0.98, info_text,
-                  transform=ax_d.transAxes,
-                  fontsize=8.5, va='top', ha='left',
-                  family='monospace',
-                  bbox=dict(boxstyle='round,pad=0.4',
-                            facecolor='#eef6ff',
-                            edgecolor='#88aacc'))
 
         self.canvas_attribution.draw()
 
