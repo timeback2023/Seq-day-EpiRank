@@ -105,11 +105,58 @@ KEY_RAILROAD_ZONE        = 'railroad_zone'
 KEY_FLU_TOTAL_CASES      = 'flu_total_cases'
 KEY_NV_TOTAL_CASES       = 'NV_total_cases'
 KEY_COVID_TOTAL_CASES     = 'covid_total_cases'
+# bs.xlsx 的名称格式为「地名, 行政类型[, 法律地位]」（如
+# "Köln, Kreisfreie Stadt"）。显示用简称，但疾病资料的匹配必须仍走全名，
+# 故另存一份原始名专供 check_list 建键使用。
+KEY_RAW_COUNTY        = 'raw_county'
+KEY_RAW_TOWN          = 'raw_town'
 
 
 # ============================================================
 # 通用工具
 # ============================================================
+
+def short_place_name(name):
+    """把 "Köln, Kreisfreie Stadt" 截成 "Köln"，仅取首个逗号前的地名。
+
+    不可直接用它做疾病资料的匹配键：全国有 21 组同名行政区（如
+    "München, Kreisfreie Stadt" 与 "München, Landkreis"、
+    "Leipzig, Kreisfreie Stadt" 与 "Leipzig, Landkreis"），简称后
+    (county, town) 会退化成同一键，导致其中一个县静默丢失病例数。
+    匹配一律使用 KEY_RAW_* 中的全名，本函数只服务于显示。
+    """
+    if name is None:
+        return None
+    return str(name).split(',')[0].strip()
+
+
+def disambiguate_short_names(town_data):
+    """同名行政区的显示名追加括号后缀。
+
+    全国有 21 组同名行政区（"München, Landeshauptstadt" 与
+    "München, Landkreis"、"Leipzig, Stadt" 与 "Leipzig, Landkreis" 等），
+    截短后显示名会重复。只给重复者加后缀：取其行政类型（逗号后的部分）
+    放进括号，如 "München (Landkreis)"；行政类型本身为空者（纯地名
+    "Ansbach"）保持原样，正好与同组的 "Ansbach, Landkreis" 区分开。
+
+    仅影响 KEY_TOWN（显示），不动 KEY_RAW_TOWN（匹配）。返回被改动的条数。
+    """
+    counts = {}
+    for rec in town_data.values():
+        counts[rec[KEY_TOWN]] = counts.get(rec[KEY_TOWN], 0) + 1
+    dupes = {name for name, c in counts.items() if c > 1}
+    changed = 0
+    for rec in town_data.values():
+        short = rec[KEY_TOWN]
+        if short not in dupes:
+            continue
+        parts = [p.strip() for p in str(rec[KEY_RAW_TOWN]).split(',')]
+        suffix = ', '.join(p for p in parts[1:] if p)
+        if suffix:
+            rec[KEY_TOWN] = f"{short} ({suffix})"
+            changed += 1
+    return changed
+
 
 def sorted_map(mapping):
     """依值降序、键升序排序字典。"""
@@ -138,8 +185,11 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet=None,
         if cell_val is None:
             continue
         db_ID              = int(cell_val)
-        county             = s.cell(row=r, column=2).value
-        town               = s.cell(row=r, column=3).value
+        raw_county        = s.cell(row=r, column=2).value
+        raw_town          = s.cell(row=r, column=3).value
+        # 显示用简称，匹配用全名（见 short_place_name 的说明）
+        county             = short_place_name(raw_county)
+        town               = short_place_name(raw_town)
         pos_xy             = (round(float(s.cell(row=r, column=7).value or 0), 2),
                               round(float(s.cell(row=r, column=8).value or 0), 2))
         raw_population     = s.cell(row=r, column=9).value or 0
@@ -153,17 +203,22 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet=None,
         age_65             = float(s.cell(row=r, column=17).value or 0)
         population         = (float(raw_population / sub_percentage)
                               if sub_percentage > 0 else float(raw_population))
-        if town != old_town:
+        # 去重必须比全名：简称后 München / Leipzig 等 21 组同名行政区会互相吞掉
+        if raw_town != old_town:
             town_data[db_ID] = {
                 KEY_COUNTY: county, KEY_TOWN: town, KEY_POS_XY: pos_xy,
+                KEY_RAW_COUNTY: raw_county, KEY_RAW_TOWN: raw_town,
                 KEY_POPULATION: population, KEY_AREA: area,
                 KEY_DENSITY: density, KEY_NORMALIZED_DENSITY: normalized_density,
                 KEY_AGE_0_14: age_0_14, KEY_AGE_15_64: age_15_64, KEY_AGE_65: age_65,
                 KEY_LOCAL_COMMUTER_TYPE1: 0, KEY_OUT_COMMUTER_TYPE1: 0,
                 KEY_IN_COMMUTER_TYPE1: 0, KEY_RAILROAD_ZONE: 0
             }
-        old_town = town
+        old_town = raw_town
     wb.close()
+
+    # 同名行政区加括号后缀（见 disambiguate_short_names）
+    n_disamb = disambiguate_short_names(town_data)
 
     # 对所有县做一次 max 归一化，使 normalized_density 落在 0–1 之间
     if town_data:
@@ -171,6 +226,10 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet=None,
         if max_log_d > 0:
             for db in town_data:
                 town_data[db][KEY_NORMALIZED_DENSITY] /= max_log_d
+
+    if n_disamb:
+        print(f"[names] {n_disamb} display names disambiguated "
+              f"(duplicate districts, e.g. Muenchen / Leipzig)")
 
 
 def build_flu_reported_cases(town_data, path='flu.xlsx', sheet=None,
@@ -185,7 +244,7 @@ def build_flu_reported_cases(town_data, path='flu.xlsx', sheet=None,
         town_name = s.cell(row=r, column=2).value
         if not check_list:
             for db_ID in town_data.keys():
-                check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+                check_list[(town_data[db_ID][KEY_RAW_COUNTY], town_data[db_ID][KEY_RAW_TOWN])] = db_ID
         db_ID = check_list.get((county, town_name), None)
         if db_ID is not None:
             raw = s.cell(row=r, column=3).value
@@ -205,7 +264,7 @@ def build_nv_reported_cases(town_data, path='nv.xlsx', sheet=None,
         town_name = s.cell(row=r, column=2).value
         if not check_list:
             for db_ID in town_data.keys():
-                check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+                check_list[(town_data[db_ID][KEY_RAW_COUNTY], town_data[db_ID][KEY_RAW_TOWN])] = db_ID
         db_ID = check_list.get((county, town_name), None)
         if db_ID is not None:
             raw = s.cell(row=r, column=3).value
@@ -225,7 +284,7 @@ def build_covid_reported_cases(town_data, path='COVID-19.xlsx', sheet=None,
         town_name = s.cell(row=r, column=2).value
         if not check_list:
             for db_ID in town_data.keys():
-                check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+                check_list[(town_data[db_ID][KEY_RAW_COUNTY], town_data[db_ID][KEY_RAW_TOWN])] = db_ID
         db_ID = check_list.get((county, town_name), None)
         if db_ID is not None:
             raw = s.cell(row=r, column=3).value
@@ -967,16 +1026,9 @@ class ComputeWorker(QThread):
                 record_attribution=True,
             )
             self.log_message.emit(f"  Converged after {iterations} iterations.")
-            if transient_metrics is not None:
-                self.log_message.emit(
-                    f"  M1: abs_spectral_gap={transient_metrics['spectral_gap']:.5f}, "
-                    f"Kemeny(sum 1/(1-lr))={transient_metrics['kemeny_constant']:.2f}")
-            if attribution_data is not None:
-                self.log_message.emit(
-                    f"  M2: closed-form residual = "
-                    f"{attribution_data['closed_form_residual']:.3e}")
 
-            # M1 / M2 指标明细
+            # M1 / M2 指标明细（abs_spectral_gap / Kemeny / closed_form_residual
+            # 均在此展开，不再另行输出摘要行）
             self.log_message.emit(
                 format_m1_m2_log(list(g.nodes()), g, town_data,
                                  transient_metrics, attribution_data))
@@ -2937,8 +2989,8 @@ class EpiRankMainWindow(QMainWindow):
             if i not in top_in_idx:
                 texts.append(ax_a.text(net_out[i], net_in[i], label_of(i), fontsize=6.5, color='darkblue'))
         adjust_text(texts, ax=ax_a, arrowprops=dict(arrowstyle='-', color='gray', lw=0.5))
-        ax_a.set_xlabel('net outflow (Σ_j F[i,j])', fontsize=9)
-        ax_a.set_ylabel('net inflow (Σ_j F[j,i])', fontsize=9)
+        ax_a.set_xlabel('net outflow (Σ_i F[i,j])', fontsize=9)
+        ax_a.set_ylabel('net inflow (Σ_j F[i,j])', fontsize=9)
         ax_a.set_title('(a) net inflow vs net outflow', fontsize=10)
         ax_a.grid(True, alpha=0.25)
         ax_a.tick_params(labelsize=7)

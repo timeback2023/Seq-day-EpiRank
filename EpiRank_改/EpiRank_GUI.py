@@ -923,16 +923,9 @@ class ComputeWorker(QThread):
                 record_attribution=True,
             )
             self.log_message.emit(f"  Converged after {iterations} iterations.")
-            if transient_metrics is not None:
-                self.log_message.emit(
-                    f"  M1: abs_spectral_gap={transient_metrics['spectral_gap']:.5f}, "
-                    f"Kemeny(sum 1/(1-lr))={transient_metrics['kemeny_constant']:.2f}")
-            if attribution_data is not None:
-                self.log_message.emit(
-                    f"  M2: closed-form residual = "
-                    f"{attribution_data['closed_form_residual']:.3e}")
 
-            # M1 / M2 指标明细
+            # M1 / M2 指标明细（abs_spectral_gap / Kemeny / closed_form_residual
+            # 均在此展开，不再另行输出摘要行）
             self.log_message.emit(
                 format_m1_m2_log(list(g.nodes()), g, town_data,
                                  transient_metrics, attribution_data))
@@ -2932,8 +2925,8 @@ class EpiRankMainWindow(QMainWindow):
             if i not in top_in_idx:
                 texts.append(ax_a.text(net_out[i], net_in[i], label_of(i), fontsize=6.5, color='darkblue'))
         adjust_text(texts, ax=ax_a, arrowprops=dict(arrowstyle='-', color='gray', lw=0.5))
-        ax_a.set_xlabel('net outflow (Σ_j F[i,j])', fontsize=9)
-        ax_a.set_ylabel('net inflow (Σ_j F[j,i])', fontsize=9)
+        ax_a.set_xlabel('net outflow (Σ_i F[i,j])', fontsize=9)
+        ax_a.set_ylabel('net inflow (Σ_j F[i,j])', fontsize=9)
         ax_a.set_title('(a) net inflow vs net outflow', fontsize=10)
         ax_a.grid(True, alpha=0.25)
         ax_a.tick_params(labelsize=7)
