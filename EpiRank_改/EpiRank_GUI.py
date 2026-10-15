@@ -841,6 +841,11 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         # 统计时排除 ER* ≈ ER_0 的节点
         ht_stat = ht[~unchanged]
         lines.append(_stat_line('Af_i', ht_stat))
+        ht_fin = ht_stat[np.isfinite(ht_stat)]
+        if ht_fin.size:
+            lines.append(f"    {'Af_i median':<26} {np.median(ht_fin):.6g}")
+        else:
+            lines.append(f"    {'Af_i median':<26} N/A (no finite value)")
         lines.append(f"    {'excluded (ER*≈ER0)':<26} {int(unchanged.sum())}")
 
         # 排名同样排除 unchanged：置 nan，由 _append_rank_table 自动跳过
@@ -854,6 +859,18 @@ def format_m1_m2_log(nodes, g, town_data, transient_metrics, attribution_data,
         vel = np.asarray(tm['velocity'], dtype=float)
         lines.append('  风险速度 velocity  (前 30 步最小二乘斜率)')
         lines.append(_stat_line('velocity', vel))
+        vel_fin = vel[np.isfinite(vel)]
+        if vel_fin.size:
+            lines.append(f"    {'velocity median':<26} "
+                         f"{np.median(vel_fin):.6g}")
+            n_pos = int((vel_fin > 0).sum())
+            lines.append(f"    {'velocity > 0 nodes':<26} "
+                         f"{n_pos} / {vel_fin.size}  "
+                         f"({n_pos / vel_fin.size * 100:.1f}%)")
+        else:
+            lines.append(f"    {'velocity median':<26} N/A (no finite value)")
+            lines.append(f"    {'velocity > 0 nodes':<26} "
+                         f'N/A (no finite value)')
         _append_rank_table(lines, f'  速度最高 top {top_n} (velocity 最大):',
                            nodes, g, town_data, vel, largest=True, top_n=top_n)
         _append_rank_table(lines, f'  速度最低 top {top_n} (velocity 最小):',
