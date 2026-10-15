@@ -106,8 +106,14 @@ KEY_FLU_TOTAL_CASES      = 'flu_total_cases'
 KEY_EV_AVERAGE_CASES     = 'EV_average_cases'
 KEY_SARS_TOTAL_CASES     = 'sars_total_cases'
 
-# 大台北都会区 48 乡镇市
-GTAIPEI_DB_IDS = set(range(0, 29)) | set(range(303, 310)) | set(range(330, 397))
+# 大台北都会区：臺北市(12) + 新北市(29) + 基隆市(7) = 48 个乡镇。
+#
+# db_ID 取值随 bs.xlsx 的县市排序而变，历史上的硬编码区间在数据重排后
+# 已经指错地方（曾选中南投/嘉義/雲林/高雄共 57 个，一个台北都没选到）。
+# 因此改为载入时依县市名称推导，与排序彻底解耦。
+# 臺/台 两种写法都收录，取决于原始表用哪一种。
+GTAIPEI_COUNTIES = ('臺北市', '台北市', '新北市', '基隆市')
+GTAIPEI_DB_IDS = set()   # 由 build_basic_table_of_towns() 在载入时填充
 
 
 # ============================================================
@@ -120,16 +126,28 @@ def sorted_map(mapping):
 
 
 def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
-                                number_of_sub_towns=409, row_base=2):
-    """从 bs.xlsx 载入乡镇基本资料。"""
+                                row_base=2):
+    """从 bs.xlsx 载入乡镇基本资料。
+
+    直到第一个空 db_ID 单元格才停，不假定固定行数——本表每行对应一个
+    行政区，长度随数据版本变化（曾为 409 子行 / 353 乡镇，现为 351 行）。
+    只保留每个镇名的第一行，即合并后的镇级统计。
+
+    并依县市名称填充模块级的 GTAIPEI_DB_IDS，使大台北集合不受重排影响。
+    """
+    global GTAIPEI_DB_IDS
+
     wb = load_workbook(path, data_only=True)
     s = wb[sheet]
     old_town = None
-    for row_idx in range(number_of_sub_towns):
-        r = row_idx + row_base
+    r = row_base
+    n_rows = 0
+
+    while True:
         cell_val = s.cell(row=r, column=1).value
         if cell_val is None:
-            continue
+            break
+        n_rows += 1
         db_ID              = int(cell_val)
         county             = s.cell(row=r, column=2).value
         town               = s.cell(row=r, column=3).value
@@ -155,76 +173,110 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
                 KEY_IN_COMMUTER_TYPE1: 0, KEY_RAILROAD_ZONE: 0
             }
         old_town = town
+        r += 1
     wb.close()
+
+    # 依县市名称推导大台北集合（db_ID 会随排序变动，不可硬编码）
+    GTAIPEI_DB_IDS = {db for db, rec in town_data.items()
+                      if rec[KEY_COUNTY] in GTAIPEI_COUNTIES}
+    print(f"[bs] {n_rows} rows -> {len(town_data)} townships; "
+          f"Greater Taipei = {len(GTAIPEI_DB_IDS)} townships")
+    if not GTAIPEI_DB_IDS:
+        print("[bs] WARNING: no Greater Taipei townships matched — "
+              "regional zoom and gTaipei correlations will be empty")
 
 
 def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet='2009',
-                              number_of_towns=353, row_base=2):
+                              row_base=2):
     """载入 2009 流感病例数。"""
     wb = load_workbook(path, data_only=True)
     s = wb[sheet]
     check_list = {}
-    for row_idx in range(number_of_towns):
-        r = row_idx + row_base
+    for db_ID in town_data.keys():
+        check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+    r = row_base
+    while True:
         county = s.cell(row=r, column=1).value
         town_name = s.cell(row=r, column=2).value
-        if not check_list:
-            for db_ID in town_data.keys():
-                check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+        if county is None:
+            break
+        r += 1
         db_ID = check_list.get((county, town_name), None)
         if db_ID is not None:
-            raw = s.cell(row=r, column=3).value
+            raw = s.cell(row=r - 1, column=3).value
             town_data[db_ID][KEY_FLU_TOTAL_CASES] = int(raw) if raw is not None else 0
     wb.close()
 
 
 def build_ev_reported_cases(town_data, path='ev.xlsx', sheet='2000_2008',
-                             number_of_towns=353, row_base=2):
+                             row_base=2):
     """载入肠病毒平均病例数。"""
     wb = load_workbook(path, data_only=True)
     s = wb[sheet]
     check_list = {}
-    for row_idx in range(number_of_towns):
-        r = row_idx + row_base
+    for db_ID in town_data.keys():
+        check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+    r = row_base
+    while True:
         county = s.cell(row=r, column=1).value
         town_name = s.cell(row=r, column=2).value
-        if not check_list:
-            for db_ID in town_data.keys():
-                check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+        if county is None:
+            break
+        r += 1
         db_ID = check_list.get((county, town_name), None)
         if db_ID is not None:
-            raw = s.cell(row=r, column=3).value
+            raw = s.cell(row=r - 1, column=3).value
             town_data[db_ID][KEY_EV_AVERAGE_CASES] = float(raw) if raw is not None else 0.0
     wb.close()
 
 
 def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet='2003',
-                               number_of_towns=353, row_base=2):
+                               row_base=2):
     """载入 2003 SARS 病例数（仅用于大台北相关性分析）。"""
     wb = load_workbook(path, data_only=True)
     s = wb[sheet]
     check_list = {}
-    for row_idx in range(number_of_towns):
-        r = row_idx + row_base
+    for db_ID in town_data.keys():
+        check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+    r = row_base
+    while True:
         county = s.cell(row=r, column=1).value
         town_name = s.cell(row=r, column=2).value
-        if not check_list:
-            for db_ID in town_data.keys():
-                check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
+        if county is None:
+            break
+        r += 1
         db_ID = check_list.get((county, town_name), None)
         if db_ID is not None:
-            raw = s.cell(row=r, column=3).value
+            raw = s.cell(row=r - 1, column=3).value
             town_data[db_ID][KEY_SARS_TOTAL_CASES] = int(raw) if raw is not None else 0
     wb.close()
 
 
 def build_commuting_network(g, town_data, path='cn.xlsx', sheet='353C',
-                             number_of_towns=353, row_base=6, col_base=6):
-    """从 cn.xlsx 建立 353×353 通勤网络。"""
+                             row_base=6, col_base=6):
+    """从 cn.xlsx 建立通勤网络。"""
     wb = load_workbook(path, read_only=False, data_only=True)
     s = wb[sheet]
     cache = {}
-    for row_idx in range(number_of_towns):
+
+    # 先探测实际尺寸：行沿 column 1 读到空为止，列沿 row 1 读到空为止。
+    # 矩阵大小随数据版本变化（历史 353×353，现为 351×351），写死会漏读或
+    # 多读，并让下方 O(n²) 的 .cell() 存取白白翻倍。
+    n_rows = 0
+    r = row_base
+    while s.cell(row=r, column=1).value is not None:
+        n_rows += 1
+        r += 1
+    n_cols = 0
+    c = col_base
+    while s.cell(row=1, column=c).value is not None:
+        n_cols += 1
+        c += 1
+
+    if n_rows != n_cols:
+        print(f"[cn] WARNING: OD matrix is {n_rows}×{n_cols} (not square)")
+
+    for row_idx in range(n_rows):
         r = row_idx + row_base
         raw_seq = s.cell(row=r, column=1).value
         if raw_seq is None:
@@ -240,7 +292,7 @@ def build_commuting_network(g, town_data, path='cn.xlsx', sheet='353C',
             row_db_ID = int(raw_db)
             cache[row_seq_no] = (row_code, row_db_ID)
 
-        for col_idx in range(number_of_towns):
+        for col_idx in range(n_cols):
             c = col_idx + col_base
             raw_col_seq = s.cell(row=1, column=c).value
             if raw_col_seq is None:
@@ -3161,12 +3213,18 @@ class EpiRankMainWindow(QMainWindow):
         authority_rank = r['authority_rank']
 
         nodes_list = list(g.nodes())
-        gTaipei_ER_rank = {s: ER_rank[s] for s in nodes_list if g.nodes[s][KEY_DB_ID] in GTAIPEI_DB_IDS}
-        gTaipei_sars = {s: sars_case_rank[s] for s in nodes_list if g.nodes[s][KEY_DB_ID] in GTAIPEI_DB_IDS}
-        gTaipei_pr_ids = set(range(0, 29)) | set(range(303, 310)) | set(range(330, 342))
-        gTaipei_page = {k: v for k, v in page_rank.items() if k in gTaipei_pr_ids}
-        gTaipei_hub = {k: v for k, v in hub_rank.items() if k in gTaipei_pr_ids}
-        gTaipei_auth = {k: v for k, v in authority_rank.items() if k in gTaipei_pr_ids}
+        # 大台北子集：五个指标一律按 db_ID 过滤，取自同一份节点清单。
+        # 不可拿 db_ID 集合去筛 *page_rank 之类的 dict——那些 dict 的键是
+        # 节点 seq_no，与 db_ID 是两套编号，混用会取到错误的节点集合，
+        # 且各子集键数不一致会让 get_*_cor 的 assert 抛错。
+        nodes_list = list(g.nodes())
+        taipei_nodes = [s for s in nodes_list
+                        if g.nodes[s][KEY_DB_ID] in GTAIPEI_DB_IDS]
+        gTaipei_ER_rank = {s: ER_rank[s] for s in taipei_nodes}
+        gTaipei_sars    = {s: sars_case_rank[s] for s in taipei_nodes}
+        gTaipei_page    = {s: page_rank[s] for s in taipei_nodes}
+        gTaipei_hub     = {s: hub_rank[s] for s in taipei_nodes}
+        gTaipei_auth    = {s: authority_rank[s] for s in taipei_nodes}
 
         # ── Population vs 网络指数 correlations (cols 8-9) ──
         pop_corr_data = [
