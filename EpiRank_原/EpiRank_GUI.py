@@ -200,7 +200,7 @@ def sorted_map(mapping):
     return sorted(mapping.items(), key=lambda kv: (-kv[1], kv[0]))
 
 
-def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
+def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet=None,
                                 row_base=2):
     """Load basic township metadata (population, area, density, age structure)
     from bs.xlsx.
@@ -217,7 +217,7 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
     global GTAIPEI_DB_IDS
 
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     old_town = None
     r = row_base
     n_rows = 0
@@ -269,7 +269,7 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
               "regional zoom and gTaipei correlations will be empty")
 
 
-def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet='2009',
+def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet=None,
                               row_base=2):
     """Load 2009 influenza case counts from Flu.xlsx into town_data.
 
@@ -277,7 +277,7 @@ def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet='2009',
     Source: Taiwan CDC (疾管署) yearly surveillance data.
     """
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     check_list = {}
     for db_ID in town_data.keys():
         check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
@@ -295,12 +295,12 @@ def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet='2009',
     wb.close()
 
 
-def build_ev_reported_cases(town_data, path='ev.xlsx', sheet='2000_2008',
+def build_ev_reported_cases(town_data, path='ev.xlsx', sheet=None,
                              row_base=2):
     """Load 2000–2008 average enterovirus case counts from ev.xlsx into
     town_data.  EV data is stored as a float (yearly average)."""
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     check_list = {}
     for db_ID in town_data.keys():
         check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
@@ -318,7 +318,7 @@ def build_ev_reported_cases(town_data, path='ev.xlsx', sheet='2000_2008',
     wb.close()
 
 
-def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet='2003',
+def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet=None,
                                row_base=2):
     """Load 2003 SARS case counts from SARS.xlsx into town_data.
 
@@ -326,7 +326,7 @@ def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet='2003',
     for the full-Taiwan EpiRank vs disease comparison in the paper).
     """
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     check_list = {}
     for db_ID in town_data.keys():
         check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
@@ -344,7 +344,7 @@ def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet='2003',
     wb.close()
 
 
-def build_commuting_network(g, town_data, path='cn.xlsx', sheet='352C',
+def build_commuting_network(g, town_data, path='cn.xlsx', sheet=None,
                               row_base=6, col_base=6):
     """Build the 353×353 directed commuting network from cn.xlsx.
 
@@ -377,7 +377,7 @@ def build_commuting_network(g, town_data, path='cn.xlsx', sheet='352C',
     calls O(n²)-slow, causing this function to take >100 s instead of <1 s.
     """
     wb = load_workbook(path, read_only=False, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     cache = {}
 
     # 先探测实际尺寸：行沿 column 1 读到空为止，列沿 row 1 读到空为止。

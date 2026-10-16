@@ -125,7 +125,7 @@ def sorted_map(mapping):
     return sorted(mapping.items(), key=lambda kv: (-kv[1], kv[0]))
 
 
-def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
+def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet=None,
                                 row_base=2):
     """从 bs.xlsx 载入乡镇基本资料。
 
@@ -138,7 +138,7 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
     global GTAIPEI_DB_IDS
 
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     old_town = None
     r = row_base
     n_rows = 0
@@ -186,11 +186,11 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet='town_data',
               "regional zoom and gTaipei correlations will be empty")
 
 
-def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet='2009',
+def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet=None,
                               row_base=2):
     """载入 2009 流感病例数。"""
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     check_list = {}
     for db_ID in town_data.keys():
         check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
@@ -208,11 +208,11 @@ def build_flu_reported_cases(town_data, path='Flu.xlsx', sheet='2009',
     wb.close()
 
 
-def build_ev_reported_cases(town_data, path='ev.xlsx', sheet='2000_2008',
+def build_ev_reported_cases(town_data, path='ev.xlsx', sheet=None,
                              row_base=2):
     """载入肠病毒平均病例数。"""
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     check_list = {}
     for db_ID in town_data.keys():
         check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
@@ -230,11 +230,11 @@ def build_ev_reported_cases(town_data, path='ev.xlsx', sheet='2000_2008',
     wb.close()
 
 
-def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet='2003',
+def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet=None,
                                row_base=2):
     """载入 2003 SARS 病例数（仅用于大台北相关性分析）。"""
     wb = load_workbook(path, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     check_list = {}
     for db_ID in town_data.keys():
         check_list[(town_data[db_ID][KEY_COUNTY], town_data[db_ID][KEY_TOWN])] = db_ID
@@ -252,11 +252,11 @@ def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet='2003',
     wb.close()
 
 
-def build_commuting_network(g, town_data, path='cn.xlsx', sheet='352C',
+def build_commuting_network(g, town_data, path='cn.xlsx', sheet=None,
                              row_base=6, col_base=6):
     """从 cn.xlsx 建立通勤网络。"""
     wb = load_workbook(path, read_only=False, data_only=True)
-    s = wb[sheet]
+    s = wb[sheet] if sheet else wb[wb.sheetnames[0]]
     cache = {}
 
     # 先探测实际尺寸：行沿 column 1 读到空为止，列沿 row 1 读到空为止。
