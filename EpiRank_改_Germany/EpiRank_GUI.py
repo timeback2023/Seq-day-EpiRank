@@ -414,6 +414,125 @@ def get_kendalltau_cor(dic1, dic2):
 
 
 # ============================================================
+# 偏相关（控制人口混杂）
+# ============================================================
+# 病例数与 EpiRank 都随人口规模单调上升，直接做相关会得到「人口越大二者都
+# 越大」的假性正相关。人口效应是乘性的，因此控制变量（人口）与两个被解释
+# 变量一律先取对数（见 _log_series），再在线性尺度上剔除控制变量的成分，
+# 得到的是与人口规模无关的那部分关联。
+#
+#   Pearson  ：标准公式 r_xy.z = (r_xy - r_xz·r_yz) / sqrt((1-r_xz²)(1-r_yz²))
+#   Spearman ：先对三者取秩（平均秩），再套用上述公式
+#
+# 对数底数（e / 10 / 2 …）不影响结果：偏相关只用三个 Pearson 相关，而
+# Pearson 相关对仿射变换不变，换底数只是整体缩放。
+#
+# 零值与负值由 _log_series 统一处理：全正则 log(x)；含 0 但仍 > -1 则退
+# log(1+x)（病例数有 23%~81% 的零值，HITS-Hub 也含 0）；含 nan/inf 或
+# <= -1 时返回 None，由调用处显式记为 nan。三者必须同进同出——只要有一个
+# 退回原值，「剔除乘性人口效应」的前提就被破坏，会静默退化成半对数版本。
+#
+# Kendall 不做偏相关：scipy 无偏相关实现，残差法得到的 tau 与上面两列不属
+# 同一数学家族，混在一张表里容易误读，故只保留 Pearson / Spearman。
+
+
+def _as_float_vec(dic, keys):
+    """取字典子集并转成 float 向量；含 nan/inf 时返回 None。"""
+    v = np.array([dic[k] for k in keys], dtype=float)
+    if not np.isfinite(v).all():
+        return None
+    return v
+
+
+def _pearson_xy(x, y):
+    """两条序列的 Pearson r；任一方为常量时返回 nan。"""
+    sx, sy = x.std(), y.std()
+    if sx == 0 or sy == 0:
+        return float('nan')
+    return float(np.mean((x - x.mean()) * (y - y.mean())) / (sx * sy))
+
+
+def _pearson_partial_from_r(r_xy, r_xz, r_yz):
+    """由三个两两 Pearson r 合成偏相关；三者退化时返回 nan。
+
+    退化判据用相对尺度而非只看 denom <= 0：当被解释变量与控制变量是同一个量
+    （Evaluation Summary 里的 Population 行，x 与 z 同为 log(人口)）时，
+    r_xz 数学上恒为 1，残差方差为 0，偏相关是 0/0 无定义。此时浮点舍入会把
+    r_xz 落成 1-1e-16 或 1+1e-16——前者分母是极小正数、算出 ~0 而非 nan，
+    后者分母为负、返回 nan，同一行会出现 Pearson 给 0 而 Spearman 给 N/A 的
+    不一致。取 1e-12（约为 float64 eps 的 4500 倍）作为阈值，把这类残差
+    判为噪声并统一返回 nan。
+    """
+    if not all(np.isfinite([r_xy, r_xz, r_yz])):
+        return float('nan')
+    resid_xz = 1.0 - r_xz ** 2
+    resid_yz = 1.0 - r_yz ** 2
+    if resid_xz <= 1e-12 or resid_yz <= 1e-12:
+        return float('nan')
+    denom = np.sqrt(resid_xz * resid_yz)
+    if not np.isfinite(denom) or denom <= 0:
+        return float('nan')
+    return (r_xy - r_xz * r_yz) / denom
+
+
+def _partial_inputs(dic1, dic2, ctrl):
+    """校验三者键集一致并取公共键；样本不足或含非有限值时返回 None。"""
+    assert set(dic1.keys()) == set(dic2.keys()) == set(ctrl.keys()), \
+        f"Key mismatch: {len(dic1)} / {len(dic2)} / {len(ctrl)} keys"
+    keys = list(dic1.keys())
+    # 偏相关吃掉 1 个自由度（df = n - 3），至少要 4 个样本
+    if len(keys) < 4:
+        return None
+    x, y, z = (_as_float_vec(d, keys) for d in (dic1, dic2, ctrl))
+    if x is None or y is None or z is None:
+        return None
+    return x, y, z
+
+
+def _log_series(dic):
+    """对字典做对数变换（供偏相关的被解释变量使用）。
+
+    全部为正时用 log(x)——EpiRank 这类连续正值用它才能真正压缩动态范围
+    （取值 4.5e-4~1.3e-2，log1p 与原值几乎相同，等于没变换）；
+    含 0 时退回 log(1+x)——病例数有 23%~81% 的零值、HITS-Hub 也含 0，
+    直接 log 会得到 -inf。
+
+    任何无法取对数的输入（nan / inf / <= -1）一律返回 None，由上层显式
+    标 N/A；不能返回含 nan 的字典，否则问题会被静默渗进计算结果。
+    """
+    v = np.array(list(dic.values()), dtype=float)
+    if not np.isfinite(v).all():
+        return None
+    if (v > 0).all():
+        return {k: float(np.log(val)) for k, val in dic.items()}
+    if (v > -1).all():                 # log1p 的合法域
+        return {k: float(np.log1p(val)) for k, val in dic.items()}
+    return None                         # 含 <= -1 的值，无法取对数
+
+
+def get_pearson_partial_cor(dic1, dic2, ctrl):
+    """控制 ctrl 后的 Pearson 偏相关（原始值上计算）。"""
+    got = _partial_inputs(dic1, dic2, ctrl)
+    if got is None:
+        return float('nan')
+    x, y, z = got
+    return round(_pearson_partial_from_r(_pearson_xy(x, y),
+                                         _pearson_xy(x, z),
+                                         _pearson_xy(y, z)), 6)
+
+
+def get_spearman_partial_cor(dic1, dic2, ctrl):
+    """控制 ctrl 后的 Spearman 偏相关（先取秩再套用 Pearson 偏相关公式）。"""
+    got = _partial_inputs(dic1, dic2, ctrl)
+    if got is None:
+        return float('nan')
+    rx, ry, rz = (st.rankdata(v) for v in got)
+    return round(_pearson_partial_from_r(_pearson_xy(rx, ry),
+                                         _pearson_xy(rx, rz),
+                                         _pearson_xy(ry, rz)), 6)
+
+
+# ============================================================
 # Head/Tail Breaks 分类
 # ============================================================
 
@@ -1114,6 +1233,20 @@ class ComputeWorker(QThread):
                     pr = get_pearson_cor(idx_dict, dis_dict) if len(common_keys) > 2 else float('nan')
                     sr = get_spearman_cor(idx_dict, dis_dict) if len(common_keys) > 2 else float('nan')
                     kr = get_kendalltau_cor(idx_dict, dis_dict) if len(common_keys) > 2 else float('nan')
+                    sub1 = {k: idx_dict[k] for k in common_keys}
+                    sub2 = {k: dis_dict[k] for k in common_keys}
+                    sub3 = {k: pop_rank[k] for k in common_keys}
+                    # 人口效应是乘性的，故控制变量与两个被解释变量一律经 _log_series 取对数，
+                    # 三者同进同出；任一无法取对数时显式记为 nan。
+                    # 底数不影响结果（Pearson 相关对仿射变换不变）。
+                    lg1 = _log_series(sub1)
+                    lg2 = _log_series(sub2)
+                    lg3 = _log_series(sub3)
+                    if lg1 is None or lg2 is None or lg3 is None:
+                        pcr = scr = float('nan')
+                    else:
+                        pcr = get_pearson_partial_cor(lg1, lg2, lg3)
+                        scr = get_spearman_partial_cor(lg1, lg2, lg3)
                     recall, precision, f1 = compute_classification_metrics(idx_dict, dis_dict)
                     evaluation_summary.append({
                         'Index': idx_name,
@@ -1121,6 +1254,8 @@ class ComputeWorker(QThread):
                         'Pearson_r': pr,
                         'Spearman_rho': sr,
                         'Kendall_tau': kr,
+                        'Pearson_partial_r': pcr,
+                        'Spearman_partial_rho': scr,
                         'Recall': recall,
                         'Precision': precision,
                         'F1': f1,
@@ -2730,6 +2865,7 @@ class EpiRankMainWindow(QMainWindow):
 
         summary = self.results['evaluation_summary']
         headers = ['Index', 'Disease', 'Pearson_r', 'Spearman_rho', 'Kendall_tau',
+                   'Pearson_partial_r', 'Spearman_partial_rho',
                    'Recall', 'Precision', 'F1']
         self.eval_table.setRowCount(len(summary))
         self.eval_table.setColumnCount(len(headers))
@@ -3168,6 +3304,8 @@ class EpiRankMainWindow(QMainWindow):
                 'Pearson_r':    round_val(item['Pearson_r']),
                 'Spearman_rho': round_val(item['Spearman_rho']),
                 'Kendall_tau':  round_val(item['Kendall_tau']),
+                'Pearson_partial_r':   round_val(item['Pearson_partial_r']),
+                'Spearman_partial_rho': round_val(item['Spearman_partial_rho']),
                 'Recall':       round_val(item['Recall']),
                 'Precision':    round_val(item['Precision']),
                 'F1':           round_val(item['F1']),
@@ -3375,6 +3513,7 @@ class EpiRankMainWindow(QMainWindow):
         # ── 新增 Evaluation Summary 工作表 ──
         ws2 = wb.create_sheet("Evaluation Summary")
         headers_eval = ['Index', 'Disease', 'Pearson_r', 'Spearman_rho', 'Kendall_tau',
+                        'Pearson_partial_r', 'Spearman_partial_rho',
                         'Recall', 'Precision', 'F1']
         for col, h in enumerate(headers_eval, 1):
             cell = ws2.cell(row=1, column=col, value=h)
@@ -3387,12 +3526,14 @@ class EpiRankMainWindow(QMainWindow):
             ws2.cell(row=row_idx, column=3, value=item['Pearson_r'])
             ws2.cell(row=row_idx, column=4, value=item['Spearman_rho'])
             ws2.cell(row=row_idx, column=5, value=item['Kendall_tau'])
-            ws2.cell(row=row_idx, column=6, value=item['Recall'])
-            ws2.cell(row=row_idx, column=7, value=item['Precision'])
-            ws2.cell(row=row_idx, column=8, value=item['F1'])
+            ws2.cell(row=row_idx, column=6, value=item['Pearson_partial_r'])
+            ws2.cell(row=row_idx, column=7, value=item['Spearman_partial_rho'])
+            ws2.cell(row=row_idx, column=8, value=item['Recall'])
+            ws2.cell(row=row_idx, column=9, value=item['Precision'])
+            ws2.cell(row=row_idx, column=10, value=item['F1'])
 
         # 简单调整列宽
-        for col in range(1, 9):
+        for col in range(1, 11):
             ws2.column_dimensions[get_column_letter(col)].width = 15
 
         wb.save(path)

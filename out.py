@@ -5,6 +5,9 @@ import os
 import re
 import sys
 
+import numpy as np
+from scipy import stats as st
+
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QGroupBox, QLabel, QPushButton, QTabWidget, QTableWidget,
@@ -138,6 +141,173 @@ def _fmt(v):
     return f'{v:.4f}'
 
 
+# ==================== Steiger 检验 ====================
+# 比较同一批样本上、共享「疾病」这一个变量的两个相关系数
+# （A 模型 vs B 模型）是否有显著差异。Steiger (1980) / Williams (1959)：
+#
+#   det R = 1 - r12² - r13² - r23² + 2·r12·r13·r23   （三变量相关矩阵的行列式）
+#   t = (r12 - r13) · sqrt( (n-3)(1 + r23) / (2·det R) )
+#   df = n - 3
+#
+# r12 = A 指标 vs 疾病，r13 = B 指标 vs 疾病，r23 = A 指标 vs B 指标。
+# 三个相关都必须来自同一批样本、同一口径，否则公式不成立。
+#
+# det R <= 0 表示这三个两两相关无法同时成立（即不存在对应的相关矩阵），
+# 此时公式无意义，按 N/A 处理。
+#
+# Spearman 那一列先把三条序列取秩再算 Pearson r（即 scipy 的定义），
+# 再套同一公式——这是把 Steiger 公式套到 ρ 上的常见近似做法。
+
+STEIGER_METRICS = ('Pearson_r', 'Spearman_rho')
+
+
+def _pearson_r(x, y):
+    """两条序列的 Pearson r；任一方为常量时返回 nan。"""
+    if x.std() == 0 or y.std() == 0:
+        return float('nan')
+    return float(np.corrcoef(x, y)[0, 1])
+
+
+def steiger_pvalue(r_12, r_13, r_23, n):
+    """Steiger (1980) / Williams (1959) 双尾检验。
+
+    用于比较共享同一个变量的两个相关系数 r_12 与 r_13
+    （此处共享变量是疾病，A、B 是两个模型）。
+
+        t = (r12 - r13) * sqrt( (n-3)(1+r23) / (2*det R) )
+        det R = 1 - r12² - r13² - r23² + 2 r12 r13 r23
+        df = n - 3
+    """
+    if n is None or n < 4:
+        return None
+    if any(v is None or not math.isfinite(v) for v in (r_12, r_13, r_23)):
+        return None
+
+    det_r = (1.0 - r_12 ** 2 - r_13 ** 2 - r_23 ** 2
+             + 2.0 * r_12 * r_13 * r_23)
+    if not math.isfinite(det_r) or det_r <= 0:
+        # det R <= 0 意味着三个相关无法同时成立（不可能是同一个总体的
+        # 相关矩阵），此时公式无意义，返回 None 由上层标记为 N/A。
+        return None
+
+    denom = 2.0 * det_r / (1.0 + r_23)
+    if not math.isfinite(denom) or denom <= 0:
+        return None
+
+    t = (r_12 - r_13) * math.sqrt((n - 3) / denom)
+    p = 2.0 * st.t.sf(abs(t), n - 3)
+    if not math.isfinite(p):
+        return None
+    return min(max(p, 0.0), 1.0)
+
+
+def steiger_p_for(labels_a, labels_b, index, disease, metric):
+    """从两份 core_labels 取对齐的三条序列，算 Steiger 检验的 p 值。"""
+    if metric not in STEIGER_METRICS:
+        return None
+    if not (labels_a and labels_b):
+        return None
+    src_a = labels_a.get(index)
+    src_b = labels_b.get(index)
+    dis = labels_a.get(disease) or labels_b.get(disease)
+    if not (src_a and src_b and dis):
+        return None
+
+    ids = sorted(set(src_a) & set(src_b) & set(dis), key=lambda x: int(x))
+    n = len(ids)
+    if n < 4:
+        return None
+    try:
+        va = np.array([src_a[i]['score'] for i in ids], dtype=float)
+        vb = np.array([src_b[i]['score'] for i in ids], dtype=float)
+        vd = np.array([dis[i]['score'] for i in ids], dtype=float)
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not (np.isfinite(va).all() and np.isfinite(vb).all()
+            and np.isfinite(vd).all()):
+        return None
+
+    if metric == 'Spearman_rho':
+        va, vb, vd = st.rankdata(va), st.rankdata(vb), st.rankdata(vd)
+    return steiger_pvalue(_pearson_r(va, vd), _pearson_r(vb, vd),
+                          _pearson_r(va, vb), n)
+
+
+def _fmt_p(p):
+    if p is None:
+        return 'N/A'
+    if p < 1e-4:
+        return '<0.0001'
+    return f'{p:.4f}'
+
+
+# ==================== Bootstrap 置信区间 ====================
+# Recall / Precision / F1 不是相关系数，Steiger 检验不适用。
+# 改为按乡镇有放回重采样，得到 Δ（= B - A）的经验分布与 95% 百分位区间。
+# 一次重采样同时给出三项指标的分布，因此每个 (指标, 疾病) 只跑一次。
+
+BOOTSTRAP_METRICS = ('Recall', 'Precision', 'F1')
+
+
+def bootstrap_metric_diff(label_a, label_b, disease_label,
+                           n_boot=2000, seed=0):
+    """按乡镇重采样，得到 ΔRecall / ΔPrecision / ΔF1 的经验分布。
+
+    返回 {metric: (mean, (lo, hi))}，区间为 2.5 / 97.5 百分位。
+    """
+    rng = np.random.default_rng(seed)
+    ids = sorted(set(label_a) & set(label_b) & set(disease_label))
+    n = len(ids)
+    if n == 0:
+        return None
+    deltas = {'Recall': [], 'Precision': [], 'F1': []}
+    for _ in range(n_boot):
+        idx = rng.integers(0, n, n)
+        sample = [ids[i] for i in idx]
+        a_pred = {k for k in sample if label_a[k]['level'] != 'NC'}
+        b_pred = {k for k in sample if label_b[k]['level'] != 'NC'}
+        actual = {k for k in sample if disease_label[k]['level'] != 'NC'}
+
+        def metrics(pred):
+            tp = len(pred & actual); fp = len(pred - actual); fn = len(actual - pred)
+            rec  = tp / (tp + fn) if (tp + fn) else 0
+            prec = tp / (tp + fp) if (tp + fp) else 0
+            f1   = 2*prec*rec/(prec+rec) if (prec+rec) else 0
+            return rec, prec, f1
+
+        ra, pa, fa = metrics(a_pred)
+        rb, pb, fb = metrics(b_pred)
+        deltas['Recall'].append(rb - ra)
+        deltas['Precision'].append(pb - pa)
+        deltas['F1'].append(fb - fa)
+
+    return {k: (float(np.mean(v)), np.percentile(v, [2.5, 97.5]))
+            for k, v in deltas.items()}
+
+
+def bootstrap_ci_for(labels_a, labels_b, index, disease):
+    """取三项分类指标的 Δ 自助分布；不可用时返回 None。"""
+    if not (labels_a and labels_b):
+        return None
+    la = labels_a.get(index)
+    lb = labels_b.get(index)
+    dl = labels_a.get(disease) or labels_b.get(disease)
+    if not (la and lb and dl):
+        return None
+    # 两模型的核心分级逐个相同 → 任何重采样下 Δ 都恒为 0，无需跑自助法
+    common = set(la) & set(lb)
+    if common and all(la[k].get('level') == lb[k].get('level') for k in common):
+        return {m: (0.0, (0.0, 0.0)) for m in BOOTSTRAP_METRICS}
+    return bootstrap_metric_diff(la, lb, dl)
+
+
+def _fmt_ci(ci):
+    if ci is None:
+        return 'N/A'
+    _, (lo, hi) = ci
+    return f'[{lo:+.3f}, {hi:+.3f}]'
+
+
 class DiffWindow(QMainWindow):
     def __init__(self, lookup_a, lookup_b, file_a, file_b,
                  diseases, indices,
@@ -180,7 +350,8 @@ class DiffWindow(QMainWindow):
                 grp = QGroupBox(disease)
                 grp_layout = QVBoxLayout(grp)
                 self._build_metric_group(grp_layout, idx, disease,
-                                          lookup_a, lookup_b)
+                                          lookup_a, lookup_b,
+                                          labels_a, labels_b)
                 tab_layout.addWidget(grp)
 
             tabs.addTab(tab, idx)
@@ -204,7 +375,7 @@ class DiffWindow(QMainWindow):
 
     # ---------- 原指标差异表 ----------
     def _build_metric_group(self, grp_layout, idx, disease,
-                             lookup_a, lookup_b):
+                             lookup_a, lookup_b, labels_a, labels_b):
         headers = [''] + [METRIC_LABELS[m] for m in METRIC_KEYS]
         rows = []
         for label, name in [('A', MODEL_A_NAME),
@@ -226,6 +397,28 @@ class DiffWindow(QMainWindow):
                     else:
                         row.append(('-', None))
             rows.append(row)
+
+        # Steiger p / Bootstrap CI：排在 Δ 行的下一行。
+        # 相关系数列给 Steiger 检验的双尾 p 值；
+        # 分类指标（Recall / Precision / F1）不是相关系数，改给按乡镇
+        # 重采样得到的 Δ 的 95% 自助置信区间；
+        # Kendall_tau 没有做偏相关也没有自助区间，填 N/A。
+        sig_row = ['Steiger p/Bootstrap CI']
+        sig_vals = {}
+        ci_all = bootstrap_ci_for(labels_a, labels_b, idx, disease)
+        for m in METRIC_KEYS:
+            if m in STEIGER_METRICS:
+                p = steiger_p_for(labels_a, labels_b, idx, disease, m)
+                sig_vals[m] = ('p', p)
+                sig_row.append(_fmt_p(p))
+            elif m in BOOTSTRAP_METRICS:
+                ci = (ci_all or {}).get(m)
+                sig_vals[m] = ('ci', ci)
+                sig_row.append(_fmt_ci(ci))
+            else:
+                sig_vals[m] = (None, None)
+                sig_row.append('N/A')
+        rows.append(sig_row)
 
         tbl = QTableWidget(len(rows), len(headers))
         tbl.setHorizontalHeaderLabels(headers)
@@ -266,6 +459,21 @@ class DiffWindow(QMainWindow):
                     )
                     if r == 2:
                         item.setBackground(QBrush(QColor('#fafafa')))
+                    elif r == 3:
+                        # Steiger p / Bootstrap CI 行：
+                        # 显著项（p<0.05 或 95% CI 不含 0）标红加粗
+                        item.setBackground(QBrush(QColor('#f4f6f7')))
+                        kind, v = (sig_vals.get(METRIC_KEYS[c - 1])
+                                   if c >= 1 else (None, None))
+                        if kind == 'p':
+                            sig = v is not None and v < 0.05
+                        elif kind == 'ci':
+                            sig = v is not None and (v[1][0] > 0 or v[1][1] < 0)
+                        else:
+                            sig = False
+                        if sig:
+                            item.setForeground(QBrush(QColor('#c0392b')))
+                            item.setFont(QFont('Segoe UI', 9, QFont.Bold))
                     tbl.setItem(r, c, item)
 
         grp_layout.addWidget(tbl)
