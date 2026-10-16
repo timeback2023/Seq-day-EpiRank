@@ -48,7 +48,7 @@ NV_YEARS = [2015, 2016, 2017, 2018, 2019]
 
 SHEETS = {
     'bs.xlsx': 'Sheet1',
-    'cn.xlsx': '353C',
+    'cn.xlsx': '400C',
     'COVID-19.xlsx': '2003',
     'flu.xlsx': '2015_2019',
     'nv.xlsx': '2015_2019',
@@ -297,8 +297,9 @@ def verify(rebuilt):
 
 # ---------------------------------------------------------------- 写出
 def _cn_to_frame(canon, cn_matrix):
-    """复刻 cn.xlsx 版式：405×405，第 1-3 行 AGS 表头，第 4-5 行空行，
-    第 6-405 行为 400 个县：A=seq_no, B=AGS, C=AGS, D/E 空, F..OO=OD 矩阵（0 留空）。
+    """复刻 cn.xlsx 版式：sheet `400C`，400×400 矩阵；工作表 405 行 × 405 列，
+    第 1-3 行 AGS 表头，第 4-5 行空行，第 6-405 行为 400 个县：
+    A=seq_no, B=AGS, C=AGS, D/E 空, F..OO=OD 矩阵（0 留空）。
     """
     ags = canon['AGS num'].to_numpy()
     grid = [[None] * (5 + N_COUNTY) for _ in range(3 + 2 + N_COUNTY)]

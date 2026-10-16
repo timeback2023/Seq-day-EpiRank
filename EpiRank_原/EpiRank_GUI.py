@@ -344,7 +344,7 @@ def build_sars_reported_cases(town_data, path='SARS.xlsx', sheet='2003',
     wb.close()
 
 
-def build_commuting_network(g, town_data, path='cn.xlsx', sheet='353C',
+def build_commuting_network(g, town_data, path='cn.xlsx', sheet='352C',
                               row_base=6, col_base=6):
     """Build the 353×353 directed commuting network from cn.xlsx.
 
