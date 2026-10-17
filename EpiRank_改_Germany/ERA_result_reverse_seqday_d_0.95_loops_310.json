@@ -11,6 +11,8 @@
       "Pearson_r": 0.7894,
       "Spearman_rho": 0.5948,
       "Kendall_tau": 0.4193,
+      "Pearson_partial_r": 0.2815,
+      "Spearman_partial_rho": 0.2973,
       "Recall": 0.641,
       "Precision": 0.5597,
       "F1": 0.5976
@@ -21,6 +23,8 @@
       "Pearson_r": 0.7462,
       "Spearman_rho": 0.5041,
       "Kendall_tau": 0.3506,
+      "Pearson_partial_r": -0.1278,
+      "Spearman_partial_rho": -0.0955,
       "Recall": 0.5725,
       "Precision": 0.5896,
       "F1": 0.5809
@@ -31,6 +35,8 @@
       "Pearson_r": 0.9537,
       "Spearman_rho": 0.8725,
       "Kendall_tau": 0.6978,
+      "Pearson_partial_r": 0.2818,
+      "Spearman_partial_rho": 0.3239,
       "Recall": 0.8168,
       "Precision": 0.7985,
       "F1": 0.8075
@@ -41,6 +47,8 @@
       "Pearson_r": 0.7739,
       "Spearman_rho": 0.5674,
       "Kendall_tau": 0.3977,
+      "Pearson_partial_r": 0.2343,
+      "Spearman_partial_rho": 0.2661,
       "Recall": 0.6068,
       "Precision": 0.5504,
       "F1": 0.5772
@@ -51,6 +59,8 @@
       "Pearson_r": 0.707,
       "Spearman_rho": 0.4606,
       "Kendall_tau": 0.3177,
+      "Pearson_partial_r": -0.1273,
+      "Spearman_partial_rho": -0.0873,
       "Recall": 0.5435,
       "Precision": 0.5814,
       "F1": 0.5618
@@ -61,6 +71,8 @@
       "Pearson_r": 0.9235,
       "Spearman_rho": 0.8104,
       "Kendall_tau": 0.6249,
+      "Pearson_partial_r": 0.2255,
+      "Spearman_partial_rho": 0.2787,
       "Recall": 0.7634,
       "Precision": 0.7752,
       "F1": 0.7692
@@ -69,8 +81,10 @@
       "Index": "HITS-Hub",
       "Disease": "Flu",
       "Pearson_r": 0.4764,
-      "Spearman_rho": 0.1423,
-      "Kendall_tau": 0.0894,
+      "Spearman_rho": 0.1615,
+      "Kendall_tau": 0.1053,
+      "Pearson_partial_r": 0.0347,
+      "Spearman_partial_rho": 0.2314,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -79,8 +93,10 @@
       "Index": "HITS-Hub",
       "Disease": "NV",
       "Pearson_r": 0.7293,
-      "Spearman_rho": 0.2799,
-      "Kendall_tau": 0.1834,
+      "Spearman_rho": 0.2958,
+      "Kendall_tau": 0.1934,
+      "Pearson_partial_r": 0.0571,
+      "Spearman_partial_rho": 0.4315,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -89,8 +105,10 @@
       "Index": "HITS-Hub",
       "Disease": "COVID-19",
       "Pearson_r": 0.6492,
-      "Spearman_rho": -0.0952,
-      "Kendall_tau": -0.0635,
+      "Spearman_rho": -0.0923,
+      "Kendall_tau": -0.0606,
+      "Pearson_partial_r": -0.0492,
+      "Spearman_partial_rho": -0.1758,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -99,8 +117,10 @@
       "Index": "HITS-Authority",
       "Disease": "Flu",
       "Pearson_r": 0.4764,
-      "Spearman_rho": 0.1366,
-      "Kendall_tau": 0.0852,
+      "Spearman_rho": 0.1651,
+      "Kendall_tau": 0.1083,
+      "Pearson_partial_r": 0.0342,
+      "Spearman_partial_rho": 0.249,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -109,8 +129,10 @@
       "Index": "HITS-Authority",
       "Disease": "NV",
       "Pearson_r": 0.7293,
-      "Spearman_rho": 0.2686,
-      "Kendall_tau": 0.1752,
+      "Spearman_rho": 0.2783,
+      "Kendall_tau": 0.1763,
+      "Pearson_partial_r": 0.0564,
+      "Spearman_partial_rho": 0.4257,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -119,8 +141,10 @@
       "Index": "HITS-Authority",
       "Disease": "COVID-19",
       "Pearson_r": 0.6494,
-      "Spearman_rho": -0.1186,
-      "Kendall_tau": -0.0812,
+      "Spearman_rho": -0.1137,
+      "Kendall_tau": -0.0763,
+      "Pearson_partial_r": -0.0485,
+      "Spearman_partial_rho": -0.1859,
       "Recall": null,
       "Precision": null,
       "F1": null
@@ -131,6 +155,8 @@
       "Pearson_r": 0.7541,
       "Spearman_rho": 0.5442,
       "Kendall_tau": 0.3826,
+      "Pearson_partial_r": null,
+      "Spearman_partial_rho": null,
       "Recall": 0.6325,
       "Precision": 0.5649,
       "F1": 0.5968
@@ -141,6 +167,8 @@
       "Pearson_r": 0.8367,
       "Spearman_rho": 0.6333,
       "Kendall_tau": 0.46,
+      "Pearson_partial_r": null,
+      "Spearman_partial_rho": null,
       "Recall": 0.6377,
       "Precision": 0.6718,
       "F1": 0.6543
@@ -151,6 +179,8 @@
       "Pearson_r": 0.9924,
       "Spearman_rho": 0.9809,
       "Kendall_tau": 0.886,
+      "Pearson_partial_r": null,
+      "Spearman_partial_rho": null,
       "Recall": 0.9237,
       "Precision": 0.9237,
       "F1": 0.9237
@@ -5588,7 +5618,7 @@
       },
       "92": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Borken",
         "town": "Borken"
       },
@@ -5672,7 +5702,7 @@
       },
       "109": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ennepe-Ruhr-Kreis",
         "town": "Ennepe-Ruhr-Kreis"
       },
@@ -5684,25 +5714,25 @@
       },
       "63": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Düsseldorf",
         "town": "Düsseldorf"
       },
       "64": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Duisburg",
         "town": "Duisburg"
       },
       "65": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Essen",
         "town": "Essen"
       },
       "66": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Krefeld",
         "town": "Krefeld"
       },
@@ -5756,13 +5786,13 @@
       },
       "75": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rhein-Kreis Neuss",
         "town": "Rhein-Kreis Neuss"
       },
       "76": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Viersen",
         "town": "Viersen"
       },
@@ -5786,7 +5816,7 @@
       },
       "81": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Städteregion Aachen (einschl. Stadt Aachen)",
         "town": "Städteregion Aachen (einschl. Stadt Aachen)"
       },
@@ -5924,7 +5954,7 @@
       },
       "128": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rheingau-Taunus-Kreis",
         "town": "Rheingau-Taunus-Kreis"
       },
@@ -5960,13 +5990,13 @@
       },
       "154": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bernkastel-Wittlich",
         "town": "Bernkastel-Wittlich"
       },
       "155": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Eifelkreis Bitburg-Prüm",
         "town": "Eifelkreis Bitburg-Prüm"
       },
@@ -5996,31 +6026,31 @@
       },
       "119": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Wiesbaden",
         "town": "Wiesbaden"
       },
       "117": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Frankfurt am Main",
         "town": "Frankfurt am Main"
       },
       "118": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Offenbach am Main",
         "town": "Offenbach am Main"
       },
       "123": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Hochtaunuskreis",
         "town": "Hochtaunuskreis"
       },
       "125": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Main-Taunus-Kreis",
         "town": "Main-Taunus-Kreis"
       },
@@ -6050,7 +6080,7 @@
       },
       "116": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Darmstadt",
         "town": "Darmstadt"
       },
@@ -6062,13 +6092,13 @@
       },
       "121": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Darmstadt-Dieburg",
         "town": "Darmstadt-Dieburg"
       },
       "122": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Groß-Gerau",
         "town": "Groß-Gerau"
       },
@@ -6086,13 +6116,13 @@
       },
       "127": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Offenbach",
         "town": "Offenbach"
       },
       "145": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bad Kreuznach",
         "town": "Bad Kreuznach"
       },
@@ -6104,7 +6134,7 @@
       },
       "158": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Frankenthal (Pfalz)",
         "town": "Frankenthal (Pfalz)"
       },
@@ -6116,25 +6146,25 @@
       },
       "160": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Landau in der Pfalz",
         "town": "Landau in der Pfalz"
       },
       "161": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ludwigshafen am Rhein",
         "town": "Ludwigshafen am Rhein"
       },
       "162": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Mainz",
         "town": "Mainz"
       },
       "163": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Neustadt an der Weinstraße",
         "town": "Neustadt an der Weinstraße"
       },
@@ -6146,7 +6176,7 @@
       },
       "166": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Worms",
         "town": "Worms"
       },
@@ -6164,31 +6194,31 @@
       },
       "170": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Donnersbergkreis",
         "town": "Donnersbergkreis"
       },
       "171": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Germersheim",
         "town": "Germersheim"
       },
       "172": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Kaiserslautern",
         "town": "Kaiserslautern (Landkreis)"
       },
       "173": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Kusel",
         "town": "Kusel"
       },
       "174": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Südliche Weinstraße",
         "town": "Südliche Weinstraße"
       },
@@ -6206,13 +6236,13 @@
       },
       "184": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Heilbronn",
         "town": "Heilbronn (Stadtkreis)"
       },
       "185": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Heilbronn",
         "town": "Heilbronn (Landkreis)"
       },
@@ -6224,13 +6254,13 @@
       },
       "192": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Karlsruhe",
         "town": "Karlsruhe (Stadtkreis)"
       },
       "193": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Karlsruhe",
         "town": "Karlsruhe (Landkreis)"
       },
@@ -6296,7 +6326,7 @@
       },
       "194": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rastatt",
         "town": "Rastatt"
       },
@@ -6314,13 +6344,13 @@
       },
       "164": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Pirmasens",
         "town": "Pirmasens"
       },
       "177": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Südwestpfalz",
         "town": "Südwestpfalz"
       },
@@ -6350,7 +6380,7 @@
       },
       "221": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Sigmaringen",
         "town": "Sigmaringen"
       },
@@ -6428,13 +6458,13 @@
       },
       "167": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Zweibrücken",
         "town": "Zweibrücken"
       },
       "318": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Saarbrücken",
         "town": "Saarbrücken"
       },
@@ -6446,25 +6476,25 @@
       },
       "320": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Neunkirchen",
         "town": "Neunkirchen"
       },
       "322": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Saarpfalz-Kreis",
         "town": "Saarpfalz-Kreis"
       },
       "191": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Baden-Baden",
         "town": "Baden-Baden"
       },
       "200": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Calw",
         "town": "Calw"
       },
@@ -6482,7 +6512,7 @@
       },
       "202": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Freudenstadt",
         "town": "Freudenstadt"
       },
@@ -6494,7 +6524,7 @@
       },
       "183": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rems-Murr-Kreis",
         "town": "Rems-Murr-Kreis"
       },
@@ -6542,7 +6572,7 @@
       },
       "209": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Tuttlingen",
         "town": "Tuttlingen"
       },
@@ -6554,13 +6584,13 @@
       },
       "213": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Reutlingen",
         "town": "Reutlingen"
       },
       "215": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Zollernalbkreis",
         "town": "Zollernalbkreis"
       },
@@ -6584,13 +6614,13 @@
       },
       "311": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Günzburg",
         "town": "Günzburg"
       },
       "312": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Neu-Ulm",
         "town": "Neu-Ulm"
       },
@@ -6602,13 +6632,13 @@
       },
       "220": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ravensburg",
         "town": "Ravensburg"
       },
       "225": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Altötting",
         "town": "Altötting"
       },
@@ -6662,7 +6692,7 @@
       },
       "315": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Unterallgäu",
         "town": "Unterallgäu"
       },
@@ -6674,7 +6704,7 @@
       },
       "235": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Landsberg am Lech",
         "town": "Landsberg am Lech"
       },
@@ -6686,7 +6716,7 @@
       },
       "212": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Waldshut",
         "town": "Waldshut"
       },
@@ -6746,7 +6776,7 @@
       },
       "233": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Fürstenfeldbruck",
         "town": "Fürstenfeldbruck"
       },
@@ -6770,7 +6800,7 @@
       },
       "228": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Dachau",
         "town": "Dachau"
       },
@@ -6782,13 +6812,13 @@
       },
       "242": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Starnberg",
         "town": "Starnberg"
       },
       "305": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Kaufbeuren",
         "town": "Kaufbeuren"
       },
@@ -6812,13 +6842,13 @@
       },
       "203": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Freiburg im Breisgau",
         "town": "Freiburg im Breisgau"
       },
       "204": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Breisgau-Hochschwarzwald",
         "town": "Breisgau-Hochschwarzwald"
       },
@@ -6836,73 +6866,73 @@
       },
       "219": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bodenseekreis",
         "town": "Bodenseekreis"
       },
       "317": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Oberallgäu",
         "town": "Oberallgäu"
       },
       "236": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Miesbach",
         "town": "Miesbach"
       },
       "227": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bad Tölz-Wolfratshausen",
         "town": "Bad Tölz-Wolfratshausen"
       },
       "306": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Kempten (Allgäu)",
         "town": "Kempten (Allgäu)"
       },
       "314": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ostallgäu",
         "town": "Ostallgäu"
       },
       "234": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Garmisch-Partenkirchen",
         "town": "Garmisch-Partenkirchen"
       },
       "244": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Weilheim-Schongau",
         "town": "Weilheim-Schongau"
       },
       "223": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "München",
         "town": "München (Landeshauptstadt)"
       },
       "229": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ebersberg",
         "town": "Ebersberg"
       },
       "231": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Erding",
         "town": "Erding"
       },
       "232": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Freising",
         "town": "Freising"
       },
@@ -6914,7 +6944,7 @@
       },
       "238": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "München",
         "town": "München (Landkreis)"
       },
@@ -6986,13 +7016,13 @@
       },
       "224": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rosenheim",
         "town": "Rosenheim"
       },
       "241": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rosenheim",
         "town": "Rosenheim (Landkreis)"
       },
@@ -7004,13 +7034,13 @@
       },
       "226": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Berchtesgadener Land",
         "town": "Berchtesgadener Land"
       },
       "246": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Passau",
         "town": "Passau"
       },
@@ -7022,13 +7052,13 @@
       },
       "249": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Freyung-Grafenau",
         "town": "Freyung-Grafenau"
       },
       "252": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Passau",
         "town": "Passau (Landkreis)"
       },
@@ -7990,7 +8020,7 @@
       },
       "92": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Borken",
         "town": "Borken"
       },
@@ -8068,7 +8098,7 @@
       },
       "77": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Wesel",
         "town": "Wesel"
       },
@@ -8086,25 +8116,25 @@
       },
       "63": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Düsseldorf",
         "town": "Düsseldorf"
       },
       "64": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Duisburg",
         "town": "Duisburg"
       },
       "65": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Essen",
         "town": "Essen"
       },
       "66": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Krefeld",
         "town": "Krefeld"
       },
@@ -8116,7 +8146,7 @@
       },
       "68": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Mülheim an der Ruhr",
         "town": "Mülheim an der Ruhr"
       },
@@ -8128,13 +8158,13 @@
       },
       "70": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Remscheid",
         "town": "Remscheid"
       },
       "71": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Solingen",
         "town": "Solingen"
       },
@@ -8146,7 +8176,7 @@
       },
       "73": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Kleve",
         "town": "Kleve"
       },
@@ -8164,7 +8194,7 @@
       },
       "76": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Viersen",
         "town": "Viersen"
       },
@@ -8182,13 +8212,13 @@
       },
       "80": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Leverkusen",
         "town": "Leverkusen"
       },
       "81": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Städteregion Aachen (einschl. Stadt Aachen)",
         "town": "Städteregion Aachen (einschl. Stadt Aachen)"
       },
@@ -8200,19 +8230,19 @@
       },
       "83": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rhein-Erft-Kreis",
         "town": "Rhein-Erft-Kreis"
       },
       "84": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Euskirchen",
         "town": "Euskirchen"
       },
       "85": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Heinsberg",
         "town": "Heinsberg"
       },
@@ -8230,7 +8260,7 @@
       },
       "88": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rhein-Sieg-Kreis",
         "town": "Rhein-Sieg-Kreis"
       },
@@ -8242,19 +8272,19 @@
       },
       "90": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Gelsenkirchen",
         "town": "Gelsenkirchen"
       },
       "104": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bochum",
         "town": "Bochum"
       },
       "106": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Hagen",
         "town": "Hagen"
       },
@@ -8302,13 +8332,13 @@
       },
       "149": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Neuwied",
         "town": "Neuwied"
       },
       "142": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Koblenz",
         "town": "Koblenz"
       },
@@ -8332,13 +8362,13 @@
       },
       "131": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Lahn-Dill-Kreis",
         "town": "Lahn-Dill-Kreis"
       },
       "132": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Limburg-Weilburg",
         "town": "Limburg-Weilburg"
       },
@@ -8362,19 +8392,19 @@
       },
       "154": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bernkastel-Wittlich",
         "town": "Bernkastel-Wittlich"
       },
       "155": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Eifelkreis Bitburg-Prüm",
         "town": "Eifelkreis Bitburg-Prüm"
       },
       "156": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Vulkaneifel",
         "town": "Vulkaneifel"
       },
@@ -8386,7 +8416,7 @@
       },
       "153": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Trier",
         "town": "Trier"
       },
@@ -8398,31 +8428,31 @@
       },
       "119": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Wiesbaden",
         "town": "Wiesbaden"
       },
       "117": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Frankfurt am Main",
         "town": "Frankfurt am Main"
       },
       "118": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Offenbach am Main",
         "town": "Offenbach am Main"
       },
       "123": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Hochtaunuskreis",
         "town": "Hochtaunuskreis"
       },
       "125": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Main-Taunus-Kreis",
         "town": "Main-Taunus-Kreis"
       },
@@ -8458,19 +8488,19 @@
       },
       "120": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bergstraße",
         "town": "Bergstraße"
       },
       "121": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Darmstadt-Dieburg",
         "town": "Darmstadt-Dieburg"
       },
       "122": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Groß-Gerau",
         "town": "Groß-Gerau"
       },
@@ -8488,13 +8518,13 @@
       },
       "127": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Offenbach",
         "town": "Offenbach"
       },
       "145": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bad Kreuznach",
         "town": "Bad Kreuznach"
       },
@@ -8518,13 +8548,13 @@
       },
       "160": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Landau in der Pfalz",
         "town": "Landau in der Pfalz"
       },
       "161": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ludwigshafen am Rhein",
         "town": "Ludwigshafen am Rhein"
       },
@@ -8536,7 +8566,7 @@
       },
       "163": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Neustadt an der Weinstraße",
         "town": "Neustadt an der Weinstraße"
       },
@@ -8572,25 +8602,25 @@
       },
       "171": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Germersheim",
         "town": "Germersheim"
       },
       "172": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Kaiserslautern",
         "town": "Kaiserslautern (Landkreis)"
       },
       "173": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Kusel",
         "town": "Kusel"
       },
       "174": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Südliche Weinstraße",
         "town": "Südliche Weinstraße"
       },
@@ -8602,19 +8632,19 @@
       },
       "176": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Mainz-Bingen",
         "town": "Mainz-Bingen"
       },
       "184": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Heilbronn",
         "town": "Heilbronn (Stadtkreis)"
       },
       "185": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Heilbronn",
         "town": "Heilbronn (Landkreis)"
       },
@@ -8632,13 +8662,13 @@
       },
       "193": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Karlsruhe",
         "town": "Karlsruhe (Landkreis)"
       },
       "195": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Heidelberg",
         "town": "Heidelberg"
       },
@@ -8662,7 +8692,7 @@
       },
       "292": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Aschaffenburg",
         "town": "Aschaffenburg"
       },
@@ -8698,7 +8728,7 @@
       },
       "194": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rastatt",
         "town": "Rastatt"
       },
@@ -8722,7 +8752,7 @@
       },
       "177": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Südwestpfalz",
         "town": "Südwestpfalz"
       },
@@ -8752,7 +8782,7 @@
       },
       "221": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Sigmaringen",
         "town": "Sigmaringen"
       },
@@ -8830,25 +8860,25 @@
       },
       "167": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Zweibrücken",
         "town": "Zweibrücken"
       },
       "318": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Saarbrücken",
         "town": "Saarbrücken"
       },
       "319": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Merzig-Wadern",
         "town": "Merzig-Wadern"
       },
       "320": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Neunkirchen",
         "town": "Neunkirchen"
       },
@@ -8860,13 +8890,13 @@
       },
       "191": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Baden-Baden",
         "town": "Baden-Baden"
       },
       "200": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Calw",
         "town": "Calw"
       },
@@ -8884,7 +8914,7 @@
       },
       "202": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Freudenstadt",
         "town": "Freudenstadt"
       },
@@ -8896,7 +8926,7 @@
       },
       "183": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Rems-Murr-Kreis",
         "town": "Rems-Murr-Kreis"
       },
@@ -8914,19 +8944,19 @@
       },
       "181": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Göppingen",
         "town": "Göppingen"
       },
       "189": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Heidenheim",
         "town": "Heidenheim"
       },
       "190": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ostalbkreis",
         "town": "Ostalbkreis"
       },
@@ -8944,7 +8974,7 @@
       },
       "209": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Tuttlingen",
         "town": "Tuttlingen"
       },
@@ -8956,13 +8986,13 @@
       },
       "213": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Reutlingen",
         "town": "Reutlingen"
       },
       "215": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Zollernalbkreis",
         "town": "Zollernalbkreis"
       },
@@ -8980,19 +9010,19 @@
       },
       "304": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Augsburg",
         "town": "Augsburg"
       },
       "311": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Günzburg",
         "town": "Günzburg"
       },
       "312": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Neu-Ulm",
         "town": "Neu-Ulm"
       },
@@ -9004,7 +9034,7 @@
       },
       "220": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Ravensburg",
         "town": "Ravensburg"
       },
@@ -9064,13 +9094,13 @@
       },
       "315": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Unterallgäu",
         "town": "Unterallgäu"
       },
       "316": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Donau-Ries",
         "town": "Donau-Ries"
       },
@@ -9088,7 +9118,7 @@
       },
       "212": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Waldshut",
         "town": "Waldshut"
       },
@@ -9184,13 +9214,13 @@
       },
       "242": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Starnberg",
         "town": "Starnberg"
       },
       "305": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Kaufbeuren",
         "town": "Kaufbeuren"
       },
@@ -9214,13 +9244,13 @@
       },
       "203": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Freiburg im Breisgau",
         "town": "Freiburg im Breisgau"
       },
       "204": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Breisgau-Hochschwarzwald",
         "town": "Breisgau-Hochschwarzwald"
       },
@@ -9238,19 +9268,19 @@
       },
       "219": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Bodenseekreis",
         "town": "Bodenseekreis"
       },
       "317": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Oberallgäu",
         "town": "Oberallgäu"
       },
       "236": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Miesbach",
         "town": "Miesbach"
       },
@@ -9262,13 +9292,13 @@
       },
       "306": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Kempten (Allgäu)",
         "town": "Kempten (Allgäu)"
       },
       "314": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ostallgäu",
         "town": "Ostallgäu"
       },
@@ -9280,19 +9310,19 @@
       },
       "244": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Weilheim-Schongau",
         "town": "Weilheim-Schongau"
       },
       "223": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "München",
         "town": "München (Landeshauptstadt)"
       },
       "229": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Ebersberg",
         "town": "Ebersberg"
       },
@@ -9316,7 +9346,7 @@
       },
       "238": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "München",
         "town": "München (Landkreis)"
       },
@@ -9394,7 +9424,7 @@
       },
       "241": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Rosenheim",
         "town": "Rosenheim (Landkreis)"
       },
@@ -9406,13 +9436,13 @@
       },
       "226": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "Berchtesgadener Land",
         "town": "Berchtesgadener Land"
       },
       "246": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Passau",
         "town": "Passau"
       },
@@ -9430,7 +9460,7 @@
       },
       "252": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "Passau",
         "town": "Passau (Landkreis)"
       },

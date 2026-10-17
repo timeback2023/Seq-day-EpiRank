@@ -12,6 +12,8 @@
       "Pearson_r": 0.5151,
       "Spearman_rho": 0.5341,
       "Kendall_tau": 0.3968,
+      "Pearson_partial_r": 0.1071,
+      "Spearman_partial_rho": 0.0642,
       "Recall": 0.7273,
       "Precision": 0.547,
       "F1": 0.6244
@@ -22,6 +24,8 @@
       "Pearson_r": 0.702,
       "Spearman_rho": 0.5994,
       "Kendall_tau": 0.4498,
+      "Pearson_partial_r": 0.2292,
+      "Spearman_partial_rho": 0.0648,
       "Recall": 0.6074,
       "Precision": 0.7009,
       "F1": 0.6508
@@ -32,6 +36,8 @@
       "Pearson_r": 0.3059,
       "Spearman_rho": 0.3469,
       "Kendall_tau": 0.2758,
+      "Pearson_partial_r": -0.0217,
+      "Spearman_partial_rho": -0.0059,
       "Recall": 0.6818,
       "Precision": 0.3846,
       "F1": 0.4918
@@ -42,6 +48,8 @@
       "Pearson_r": 0.3558,
       "Spearman_rho": 0.4476,
       "Kendall_tau": 0.3266,
+      "Pearson_partial_r": 0.0621,
+      "Spearman_partial_rho": 0.0293,
       "Recall": 0.6136,
       "Precision": 0.5143,
       "F1": 0.5596
@@ -52,6 +60,8 @@
       "Pearson_r": 0.534,
       "Spearman_rho": 0.5315,
       "Kendall_tau": 0.3895,
+      "Pearson_partial_r": 0.1919,
+      "Spearman_partial_rho": 0.0833,
       "Recall": 0.5185,
       "Precision": 0.6667,
       "F1": 0.5833
@@ -62,6 +72,8 @@
       "Pearson_r": 0.211,
       "Spearman_rho": 0.2734,
       "Kendall_tau": 0.2149,
+      "Pearson_partial_r": -0.0442,
+      "Spearman_partial_rho": -0.0399,
       "Recall": 0.5606,
       "Precision": 0.3524,
       "F1": 0.4327
@@ -70,8 +82,10 @@
       "Index": "HITS-Hub",
       "Disease": "Flu",
       "Pearson_r": 0.3864,
-      "Spearman_rho": 0.3124,
-      "Kendall_tau": 0.2437,
+      "Spearman_rho": 0.3999,
+      "Kendall_tau": 0.3076,
+      "Pearson_partial_r": 0.1431,
+      "Spearman_partial_rho": 0.1627,
       "Recall": 0.2955,
       "Precision": 1.0,
       "F1": 0.4561
@@ -80,8 +94,10 @@
       "Index": "HITS-Hub",
       "Disease": "EV",
       "Pearson_r": 0.2163,
-      "Spearman_rho": 0.0199,
-      "Kendall_tau": 0.0157,
+      "Spearman_rho": 0.1799,
+      "Kendall_tau": 0.1356,
+      "Pearson_partial_r": 0.0555,
+      "Spearman_partial_rho": -0.2615,
       "Recall": 0.163,
       "Precision": 0.8462,
       "F1": 0.2733
@@ -90,8 +106,10 @@
       "Index": "HITS-Hub",
       "Disease": "SARS",
       "Pearson_r": 0.4186,
-      "Spearman_rho": 0.3015,
-      "Kendall_tau": 0.2436,
+      "Spearman_rho": 0.386,
+      "Kendall_tau": 0.3141,
+      "Pearson_partial_r": 0.3457,
+      "Spearman_partial_rho": 0.2297,
       "Recall": 0.3636,
       "Precision": 0.9231,
       "F1": 0.5217
@@ -100,8 +118,10 @@
       "Index": "HITS-Authority",
       "Disease": "Flu",
       "Pearson_r": 0.3973,
-      "Spearman_rho": 0.2941,
-      "Kendall_tau": 0.2231,
+      "Spearman_rho": 0.4108,
+      "Kendall_tau": 0.3151,
+      "Pearson_partial_r": 0.1514,
+      "Spearman_partial_rho": 0.1911,
       "Recall": 0.3295,
       "Precision": 1.0,
       "F1": 0.4957
@@ -110,8 +130,10 @@
       "Index": "HITS-Authority",
       "Disease": "EV",
       "Pearson_r": 0.2188,
-      "Spearman_rho": 0.0365,
-      "Kendall_tau": 0.0306,
+      "Spearman_rho": 0.178,
+      "Kendall_tau": 0.1315,
+      "Pearson_partial_r": 0.0509,
+      "Spearman_partial_rho": -0.2458,
       "Recall": 0.1704,
       "Precision": 0.7931,
       "F1": 0.2805
@@ -120,8 +142,10 @@
       "Index": "HITS-Authority",
       "Disease": "SARS",
       "Pearson_r": 0.4375,
-      "Spearman_rho": 0.3069,
-      "Kendall_tau": 0.2488,
+      "Spearman_rho": 0.3736,
+      "Kendall_tau": 0.3037,
+      "Pearson_partial_r": 0.3649,
+      "Spearman_partial_rho": 0.2203,
       "Recall": 0.3939,
       "Precision": 0.8966,
       "F1": 0.5474
@@ -132,6 +156,8 @@
       "Pearson_r": 0.7582,
       "Spearman_rho": 0.6732,
       "Kendall_tau": 0.5249,
+      "Pearson_partial_r": null,
+      "Spearman_partial_rho": null,
       "Recall": 0.7841,
       "Precision": 0.6765,
       "F1": 0.7263
@@ -142,6 +168,8 @@
       "Pearson_r": 0.7269,
       "Spearman_rho": 0.7659,
       "Kendall_tau": 0.6031,
+      "Pearson_partial_r": null,
+      "Spearman_partial_rho": null,
       "Recall": 0.6148,
       "Precision": 0.8137,
       "F1": 0.7004
@@ -152,6 +180,8 @@
       "Pearson_r": 0.6349,
       "Spearman_rho": 0.4694,
       "Kendall_tau": 0.3829,
+      "Pearson_partial_r": null,
+      "Spearman_partial_rho": null,
       "Recall": 0.697,
       "Precision": 0.451,
       "F1": 0.5476
@@ -4401,7 +4431,7 @@
       },
       "4": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "南投縣",
         "town": "名間鄉"
       },
@@ -4425,7 +4455,7 @@
       },
       "8": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "南投縣",
         "town": "竹山鎮"
       },
@@ -4449,7 +4479,7 @@
       },
       "12": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "南投縣",
         "town": "鹿谷鄉"
       },
@@ -4575,7 +4605,7 @@
       },
       "2": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "南投縣",
         "town": "信義鄉"
       },
@@ -4677,25 +4707,25 @@
       },
       "303": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "斗六市"
       },
       "306": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "林內鄉"
       },
       "309": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "莿桐鄉"
       },
       "312": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "西螺鎮"
       },
@@ -4707,7 +4737,7 @@
       },
       "298": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "古坑鄉"
       },
@@ -4749,13 +4779,13 @@
       },
       "18": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "大林鎮"
       },
       "29": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "竹崎鄉"
       },
@@ -4767,13 +4797,13 @@
       },
       "24": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "梅山鄉"
       },
       "13": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義市",
         "town": "東區"
       },
@@ -4791,31 +4821,31 @@
       },
       "16": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "六腳鄉"
       },
       "17": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "大埔鄉"
       },
       "19": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "太保市"
       },
       "21": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "新港鄉"
       },
       "22": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "朴子市"
       },
@@ -4839,13 +4869,13 @@
       },
       "28": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "番路鄉"
       },
       "30": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "義竹鄉"
       },
@@ -4857,19 +4887,19 @@
       },
       "220": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "六甲區"
       },
       "231": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "後壁區"
       },
       "234": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "新營區"
       },
@@ -4881,7 +4911,7 @@
       },
       "236": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "柳營區"
       },
@@ -4893,19 +4923,19 @@
       },
       "295": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "元長鄉"
       },
       "296": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "北港鎮"
       },
       "300": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "土庫鎮"
       },
@@ -4917,7 +4947,7 @@
       },
       "307": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "水林鄉"
       },
@@ -4929,13 +4959,13 @@
       },
       "23": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "東石鄉"
       },
       "244": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "鹽水區"
       },
@@ -4959,31 +4989,31 @@
       },
       "311": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "褒忠鄉"
       },
       "31": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "嘉義縣",
         "town": "阿里山鄉"
       },
       "227": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "官田區"
       },
       "237": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "楠西區"
       },
       "337": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "那瑪夏區"
       },
@@ -4995,25 +5025,25 @@
       },
       "222": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "南化區"
       },
       "302": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "崙背鄉"
       },
       "225": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "學甲區"
       },
       "217": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "下營區"
       },
@@ -5037,19 +5067,19 @@
       },
       "228": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "將軍區"
       },
       "242": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "西港區"
       },
       "245": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "麻豆區"
       },
@@ -5061,19 +5091,19 @@
       },
       "216": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "七股區"
       },
       "224": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "大內區"
       },
       "226": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "安定區"
       },
@@ -5433,13 +5463,13 @@
       },
       "53": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "九如鄉"
       },
       "56": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "內埔鄉"
       },
@@ -5463,13 +5493,13 @@
       },
       "77": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "萬巒鄉"
       },
       "79": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "里港鄉"
       },
@@ -5481,7 +5511,7 @@
       },
       "81": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "霧臺鄉"
       },
@@ -5493,19 +5523,19 @@
       },
       "83": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "鹽埔鄉"
       },
       "84": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "麟洛鄉"
       },
       "327": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "六龜區"
       },
@@ -5517,25 +5547,25 @@
       },
       "333": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "旗山區"
       },
       "345": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "美濃區"
       },
       "346": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "茂林區"
       },
       "57": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "南州鄉"
       },
@@ -5553,43 +5583,43 @@
       },
       "70": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "潮州鎮"
       },
       "75": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "竹田鄉"
       },
       "76": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "萬丹鄉"
       },
       "243": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "關廟區"
       },
       "314": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "三民區"
       },
       "315": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "前金區"
       },
       "316": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "前鎮區"
       },
@@ -5601,25 +5631,25 @@
       },
       "318": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "左營區"
       },
       "319": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "新興區"
       },
       "320": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "旗津區"
       },
       "321": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "楠梓區"
       },
@@ -5637,43 +5667,43 @@
       },
       "324": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "鼓山區"
       },
       "325": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "仁武區"
       },
       "326": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "內門區"
       },
       "328": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "大寮區"
       },
       "330": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "大社區"
       },
       "331": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "岡山區"
       },
       "332": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "彌陀區"
       },
@@ -5685,97 +5715,97 @@
       },
       "339": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "橋頭區"
       },
       "340": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "永安區"
       },
       "342": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "燕巢區"
       },
       "348": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "路竹區"
       },
       "349": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "阿蓮區"
       },
       "350": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "鳥松區"
       },
       "351": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "鳳山區"
       },
       "54": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "佳冬鄉"
       },
       "59": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "崁頂鄉"
       },
       "62": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "新埤鄉"
       },
       "63": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "春日鄉"
       },
       "65": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "枋寮鄉"
       },
       "66": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "枋山鄉"
       },
       "67": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "林邊鄉"
       },
       "72": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "獅子鄉"
       },
       "73": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "琉球鄉"
       },
@@ -5787,13 +5817,13 @@
       },
       "338": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "梓官區"
       },
       "343": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "田寮區"
       },
@@ -5817,19 +5847,19 @@
       },
       "78": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "車城鄉"
       },
       "248": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "大武鄉"
       },
       "258": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "達仁鄉"
       },
@@ -5841,13 +5871,13 @@
       },
       "230": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "左鎮區"
       },
       "238": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "歸仁區"
       },
@@ -6249,19 +6279,19 @@
       },
       "210": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "中西區"
       },
       "211": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "北區"
       },
       "212": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "南區"
       },
@@ -6273,13 +6303,13 @@
       },
       "214": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "安平區"
       },
       "215": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "東區"
       },
@@ -6291,49 +6321,49 @@
       },
       "229": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "山上區"
       },
       "232": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "新化區"
       },
       "233": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "新市區"
       },
       "239": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "永康區"
       },
       "246": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "龍崎區"
       },
       "341": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "湖內區"
       },
       "347": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "茄萣區"
       },
       "240": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "玉井區"
       },
@@ -6345,25 +6375,25 @@
       },
       "247": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "卑南鄉"
       },
       "250": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "延平鄉"
       },
       "256": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "臺東市"
       },
       "262": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "鹿野鄉"
       },
@@ -6375,7 +6405,7 @@
       },
       "261": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺東縣",
         "town": "關山鎮"
       },
@@ -6399,13 +6429,13 @@
       },
       "267": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "花蓮縣",
         "town": "富里鄉"
       },
       "253": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺東縣",
         "town": "池上鄉"
       },
@@ -6423,13 +6453,13 @@
       },
       "269": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "花蓮縣",
         "town": "玉里鎮"
       },
       "270": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "花蓮縣",
         "town": "瑞穗鄉"
       },
@@ -6465,7 +6495,7 @@
       },
       "264": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "花蓮縣",
         "town": "卓溪鄉"
       },
@@ -6483,7 +6513,7 @@
       },
       "271": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "花蓮縣",
         "town": "秀林鄉"
       },
@@ -6495,7 +6525,7 @@
       },
       "336": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "桃源區"
       }
@@ -6503,13 +6533,13 @@
     "HITS-Authority": {
       "0": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "南投縣",
         "town": "中寮鄉"
       },
       "3": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "南投縣",
         "town": "南投市"
       },
@@ -6533,13 +6563,13 @@
       },
       "7": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "南投縣",
         "town": "水里鄉"
       },
       "8": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "南投縣",
         "town": "竹山鎮"
       },
@@ -6575,7 +6605,7 @@
       },
       "91": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "彰化縣",
         "town": "埔心鄉"
       },
@@ -6593,19 +6623,19 @@
       },
       "97": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "彰化縣",
         "town": "永靖鄉"
       },
       "100": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "彰化縣",
         "town": "田中鎮"
       },
       "102": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "彰化縣",
         "town": "社頭鄉"
       },
@@ -6689,7 +6719,7 @@
       },
       "2": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "南投縣",
         "town": "信義鄉"
       },
@@ -6701,13 +6731,13 @@
       },
       "86": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "彰化縣",
         "town": "二水鄉"
       },
       "88": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "彰化縣",
         "town": "北斗鎮"
       },
@@ -6719,7 +6749,7 @@
       },
       "92": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "彰化縣",
         "town": "埔鹽鄉"
       },
@@ -6737,7 +6767,7 @@
       },
       "99": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "彰化縣",
         "town": "溪湖鎮"
       },
@@ -6749,7 +6779,7 @@
       },
       "103": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "彰化縣",
         "town": "福興鄉"
       },
@@ -6791,13 +6821,13 @@
       },
       "303": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "斗六市"
       },
       "306": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "林內鄉"
       },
@@ -6809,7 +6839,7 @@
       },
       "312": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "西螺鎮"
       },
@@ -6821,7 +6851,7 @@
       },
       "298": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "古坑鄉"
       },
@@ -6863,7 +6893,7 @@
       },
       "18": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "大林鎮"
       },
@@ -6887,7 +6917,7 @@
       },
       "13": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義市",
         "town": "東區"
       },
@@ -6911,25 +6941,25 @@
       },
       "17": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "大埔鄉"
       },
       "19": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "太保市"
       },
       "21": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "新港鄉"
       },
       "22": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "朴子市"
       },
@@ -6947,13 +6977,13 @@
       },
       "27": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "嘉義縣",
         "town": "溪口鄉"
       },
       "28": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "番路鄉"
       },
@@ -6977,13 +7007,13 @@
       },
       "231": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "後壁區"
       },
       "234": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "新營區"
       },
@@ -6995,7 +7025,7 @@
       },
       "236": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "柳營區"
       },
@@ -7007,7 +7037,7 @@
       },
       "295": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "元長鄉"
       },
@@ -7019,7 +7049,7 @@
       },
       "300": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "土庫鎮"
       },
@@ -7031,31 +7061,31 @@
       },
       "307": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "水林鄉"
       },
       "20": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "嘉義縣",
         "town": "布袋鎮"
       },
       "23": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "嘉義縣",
         "town": "東石鄉"
       },
       "244": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "鹽水區"
       },
       "297": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "口湖鄉"
       },
@@ -7067,7 +7097,7 @@
       },
       "305": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "雲林縣",
         "town": "東勢鄉"
       },
@@ -7079,7 +7109,7 @@
       },
       "31": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "嘉義縣",
         "town": "阿里山鄉"
       },
@@ -7091,13 +7121,13 @@
       },
       "237": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "楠西區"
       },
       "337": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "那瑪夏區"
       },
@@ -7115,7 +7145,7 @@
       },
       "302": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "雲林縣",
         "town": "崙背鄉"
       },
@@ -7127,7 +7157,7 @@
       },
       "217": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "下營區"
       },
@@ -7151,7 +7181,7 @@
       },
       "228": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "將軍區"
       },
@@ -7163,7 +7193,7 @@
       },
       "245": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "麻豆區"
       },
@@ -7181,7 +7211,7 @@
       },
       "224": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "大內區"
       },
@@ -7541,19 +7571,19 @@
       },
       "52": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "三地門鄉"
       },
       "53": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "九如鄉"
       },
       "56": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "內埔鄉"
       },
@@ -7565,7 +7595,7 @@
       },
       "68": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "泰武鄉"
       },
@@ -7583,37 +7613,37 @@
       },
       "79": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "里港鄉"
       },
       "80": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "長治鄉"
       },
       "81": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "霧臺鄉"
       },
       "82": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "高樹鄉"
       },
       "83": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "鹽埔鄉"
       },
       "84": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "麟洛鄉"
       },
@@ -7631,13 +7661,13 @@
       },
       "333": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "旗山區"
       },
       "345": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "美濃區"
       },
@@ -7649,7 +7679,7 @@
       },
       "57": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "南州鄉"
       },
@@ -7673,7 +7703,7 @@
       },
       "75": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "竹田鄉"
       },
@@ -7691,19 +7721,19 @@
       },
       "314": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "三民區"
       },
       "315": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "前金區"
       },
       "316": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "前鎮區"
       },
@@ -7715,13 +7745,13 @@
       },
       "318": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "左營區"
       },
       "319": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "新興區"
       },
@@ -7733,7 +7763,7 @@
       },
       "321": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "楠梓區"
       },
@@ -7751,25 +7781,25 @@
       },
       "324": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "鼓山區"
       },
       "325": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "仁武區"
       },
       "326": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "內門區"
       },
       "328": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "大寮區"
       },
@@ -7781,7 +7811,7 @@
       },
       "331": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "岡山區"
       },
@@ -7805,25 +7835,25 @@
       },
       "340": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "永安區"
       },
       "342": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "燕巢區"
       },
       "348": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "路竹區"
       },
       "349": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "阿蓮區"
       },
@@ -7835,13 +7865,13 @@
       },
       "351": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "鳳山區"
       },
       "54": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "佳冬鄉"
       },
@@ -7853,25 +7883,25 @@
       },
       "62": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "新埤鄉"
       },
       "63": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "春日鄉"
       },
       "65": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "枋寮鄉"
       },
       "66": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "枋山鄉"
       },
@@ -7883,7 +7913,7 @@
       },
       "72": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "屏東縣",
         "town": "獅子鄉"
       },
@@ -7907,7 +7937,7 @@
       },
       "343": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "田寮區"
       },
@@ -7925,7 +7955,7 @@
       },
       "71": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "屏東縣",
         "town": "牡丹鄉"
       },
@@ -7937,7 +7967,7 @@
       },
       "248": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "大武鄉"
       },
@@ -7949,19 +7979,19 @@
       },
       "259": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺東縣",
         "town": "金峰鄉"
       },
       "230": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "左鎮區"
       },
       "238": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "歸仁區"
       },
@@ -8363,19 +8393,19 @@
       },
       "210": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "中西區"
       },
       "211": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "北區"
       },
       "212": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "南區"
       },
@@ -8387,13 +8417,13 @@
       },
       "214": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "安平區"
       },
       "215": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺南市",
         "town": "東區"
       },
@@ -8405,31 +8435,31 @@
       },
       "229": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "山上區"
       },
       "232": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "新化區"
       },
       "233": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "新市區"
       },
       "239": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "永康區"
       },
       "246": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺南市",
         "town": "龍崎區"
       },
@@ -8441,7 +8471,7 @@
       },
       "347": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "茄萣區"
       },
@@ -8471,13 +8501,13 @@
       },
       "256": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "臺東市"
       },
       "262": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "臺東縣",
         "town": "鹿野鄉"
       },
@@ -8489,7 +8519,7 @@
       },
       "261": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺東縣",
         "town": "關山鎮"
       },
@@ -8501,7 +8531,7 @@
       },
       "252": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺東縣",
         "town": "東河鄉"
       },
@@ -8513,13 +8543,13 @@
       },
       "267": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "花蓮縣",
         "town": "富里鄉"
       },
       "253": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "臺東縣",
         "town": "池上鄉"
       },
@@ -8537,7 +8567,7 @@
       },
       "269": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "花蓮縣",
         "town": "玉里鎮"
       },
@@ -8567,7 +8597,7 @@
       },
       "273": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "花蓮縣",
         "town": "萬榮鄉"
       },
@@ -8579,7 +8609,7 @@
       },
       "264": {
         "level": "NC",
-        "score": 0.0,
+        "score": -0.0,
         "county": "花蓮縣",
         "town": "卓溪鄉"
       },
@@ -8597,7 +8627,7 @@
       },
       "271": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "花蓮縣",
         "town": "秀林鄉"
       },
@@ -8609,7 +8639,7 @@
       },
       "336": {
         "level": "NC",
-        "score": -0.0,
+        "score": 0.0,
         "county": "高雄市",
         "town": "桃源區"
       }

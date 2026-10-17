@@ -38,16 +38,34 @@ MODEL_A_NAME = _derive_name(PREFIX_A)
 MODEL_B_NAME = _derive_name(PREFIX_B)
 # =============================================================================
 
-METRIC_KEYS = ['Pearson_r', 'Spearman_rho', 'Kendall_tau',
-               'Recall', 'Precision', 'F1']
 METRIC_LABELS = {
-    'Pearson_r':    'Pearson r',
-    'Spearman_rho': 'Spearman ρ',
-    'Kendall_tau':  'Kendall τ',
-    'Recall':       'Recall',
-    'Precision':    'Precision',
-    'F1':           'F1',
+    'Pearson_r':           'Pearson r',
+    'Spearman_rho':        'Spearman ρ',
+    'Kendall_tau':         'Kendall τ',
+    'Pearson_partial_r':   'Pearson partial r',
+    'Spearman_partial_rho': 'Spearman partial ρ',
+    'Recall':              'Recall',
+    'Precision':           'Precision',
+    'F1':                  'F1',
 }
+
+# 两个分页各自展示的指标。相关系数与分类指标量纲不同、显著性检验方法也不同
+# （Steiger 只适用于相关系数，分类指标改用自助置信区间），故拆成两页。
+CORRELATION_METRICS  = ['Pearson_r', 'Spearman_rho', 'Kendall_tau',
+                        'Pearson_partial_r', 'Spearman_partial_rho']
+CLASSIFICATION_METRICS = ['Recall', 'Precision', 'F1']
+
+# 不再单独分页的指标：这两个版本结果完全一致，比较没有意义
+EXCLUDED_INDICES = {'HITS-Authority', 'HITS-Hub', 'PageRank', 'Population'}
+
+TAB_CORRELATION   = '相关性系数'
+TAB_CLASSIFICATION = '分类指标'
+
+# (Tab 名, 该页指标, 该页显著性行标题)
+TAB_SPECS = [
+    (TAB_CORRELATION,    CORRELATION_METRICS,   'Steiger p'),
+    (TAB_CLASSIFICATION, CLASSIFICATION_METRICS, 'Bootstrap 95% CI'),
+]
 
 # 空间重叠比较所采用的「核心」级别定义
 OVERLAP_LEVEL_SETS = [
@@ -340,21 +358,25 @@ class DiffWindow(QMainWindow):
 
         tabs = QTabWidget()
 
-        # ── 原有：指标差异分页 ──
+        # ── 相关系数 / 分类指标：各一页，每页内按疾病分组 ──
+        # 每页的显著性行标题随该页的检验方法而定：相关系数用 Steiger 双尾
+        # p 值，分类指标不是相关系数，改用按乡镇重采样得到的 Δ 的自助置信区间。
         for idx in indices:
-            tab = QWidget()
-            tab_layout = QVBoxLayout(tab)
-            tab_layout.setContentsMargins(6, 6, 6, 6)
+            for tab_name, metric_keys, sig_label in TAB_SPECS:
+                tab = QWidget()
+                tab_layout = QVBoxLayout(tab)
+                tab_layout.setContentsMargins(6, 6, 6, 6)
 
-            for disease in diseases:
-                grp = QGroupBox(disease)
-                grp_layout = QVBoxLayout(grp)
-                self._build_metric_group(grp_layout, idx, disease,
-                                          lookup_a, lookup_b,
-                                          labels_a, labels_b)
-                tab_layout.addWidget(grp)
+                for disease in diseases:
+                    grp = QGroupBox(disease)
+                    grp_layout = QVBoxLayout(grp)
+                    self._build_metric_group(grp_layout, idx, disease,
+                                             metric_keys, sig_label,
+                                             lookup_a, lookup_b,
+                                             labels_a, labels_b)
+                    tab_layout.addWidget(grp)
 
-            tabs.addTab(tab, idx)
+                tabs.addTab(tab, tab_name)
 
         # ── 空间重叠分页 ──
         if labels_a and labels_b:
@@ -373,16 +395,16 @@ class DiffWindow(QMainWindow):
 
         scroll.setWidget(content)
 
-    # ---------- 原指标差异表 ----------
-    def _build_metric_group(self, grp_layout, idx, disease,
+    # ---------- 指标差异表 ----------
+    def _build_metric_group(self, grp_layout, idx, disease, metric_keys, sig_label,
                              lookup_a, lookup_b, labels_a, labels_b):
-        headers = [''] + [METRIC_LABELS[m] for m in METRIC_KEYS]
+        headers = [''] + [METRIC_LABELS[m] for m in metric_keys]
         rows = []
         for label, name in [('A', MODEL_A_NAME),
                             ('B', MODEL_B_NAME),
                             ('Δ', 'B-A')]:
             row = [f'{label} ({name})' if name else label]
-            for m in METRIC_KEYS:
+            for m in metric_keys:
                 key = (idx, disease)
                 va = get_val(lookup_a, key, m)
                 vb = get_val(lookup_b, key, m)
@@ -398,15 +420,13 @@ class DiffWindow(QMainWindow):
                         row.append(('-', None))
             rows.append(row)
 
-        # Steiger p / Bootstrap CI：排在 Δ 行的下一行。
-        # 相关系数列给 Steiger 检验的双尾 p 值；
-        # 分类指标（Recall / Precision / F1）不是相关系数，改给按乡镇
-        # 重采样得到的 Δ 的 95% 自助置信区间；
+        # 显著性行：排在 Δ 行的下一行，标题由调用方按本页检验方法传入
+        # （相关系数页 = Steiger p，分类指标页 = Bootstrap 95% CI）。
         # Kendall_tau 没有做偏相关也没有自助区间，填 N/A。
-        sig_row = ['Steiger p/Bootstrap CI']
+        sig_row = [sig_label]
         sig_vals = {}
         ci_all = bootstrap_ci_for(labels_a, labels_b, idx, disease)
-        for m in METRIC_KEYS:
+        for m in metric_keys:
             if m in STEIGER_METRICS:
                 p = steiger_p_for(labels_a, labels_b, idx, disease, m)
                 sig_vals[m] = ('p', p)
@@ -463,7 +483,7 @@ class DiffWindow(QMainWindow):
                         # Steiger p / Bootstrap CI 行：
                         # 显著项（p<0.05 或 95% CI 不含 0）标红加粗
                         item.setBackground(QBrush(QColor('#f4f6f7')))
-                        kind, v = (sig_vals.get(METRIC_KEYS[c - 1])
+                        kind, v = (sig_vals.get(metric_keys[c - 1])
                                    if c >= 1 else (None, None))
                         if kind == 'p':
                             sig = v is not None and v < 0.05
@@ -617,7 +637,11 @@ def main():
 
     all_keys = set(lookup_a.keys()) | set(lookup_b.keys())
     diseases = sorted({k[1] for k in all_keys})
-    indices  = sorted({k[0] for k in all_keys})
+    all_indices  = sorted({k[0] for k in all_keys})
+    indices = [i for i in all_indices if i not in EXCLUDED_INDICES]
+    dropped = [i for i in all_indices if i in EXCLUDED_INDICES]
+    if dropped:
+        print(f'已隐藏不比较的指标页: {", ".join(dropped)}')
 
     app = QApplication.instance()
     if app is None:
