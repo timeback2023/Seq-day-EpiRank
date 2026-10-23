@@ -232,20 +232,20 @@ def build_basic_table_of_towns(town_data, path='bs.xlsx', sheet=None,
         # 显示用简称，匹配用全名（见 short_place_name 的说明）
         county             = short_place_name(raw_county)
         town               = short_place_name(raw_town)
-        pos_xy             = (round(float(s.cell(row=r, column=7).value or 0), 2),
-                              round(float(s.cell(row=r, column=8).value or 0), 2))
-        raw_population     = s.cell(row=r, column=9).value or 0
-        sub_percentage     = float(s.cell(row=r, column=10).value or 0)
-        area               = float(s.cell(row=r, column=12).value or 0)
-        density            = float(s.cell(row=r, column=13).value or 0)
+        pos_xy             = (round(float(s.cell(row=r, column=4).value or 0), 2),
+                              round(float(s.cell(row=r, column=5).value or 0), 2))
+        raw_population     = s.cell(row=r, column=6).value or 0
+        sub_percentage     = 1  # sub_percentage 列已删除（原为占位符1）
+        area               = float(s.cell(row=r, column=7).value or 0)
+        density            = float(s.cell(row=r, column=8).value or 0)
         # 归一化密度：用 log10 缩放
         normalized_density = math.log10(density + 1) if density > 0 else 0.0
-        age_0_14           = float(s.cell(row=r, column=15).value or 0)
-        age_15_64          = float(s.cell(row=r, column=16).value or 0)
-        age_65             = float(s.cell(row=r, column=17).value or 0)
-
-        population         = (float(raw_population / sub_percentage)
-                              if sub_percentage > 0 else float(raw_population))
+        # age 0-14 / 15-64 / 65+ 与 railroad_zone 均为占位符列，已从 bs.xlsx 删除，
+        # 此处直接设置默认值（不再从 Excel 读取）。
+        age_0_14           = 0.15
+        age_15_64          = 0.65
+        age_65             = 0.2
+        population         = float(raw_population)
         # 去重必须比全名：简称后 München / Leipzig 等 21 组同名行政区会互相吞掉
         if raw_town != old_town:
             town_data[db_ID] = {
@@ -3372,9 +3372,9 @@ class EpiRankMainWindow(QMainWindow):
                 td[KEY_POPULATION],
                 round(td[KEY_AREA], 2), round(td[KEY_DENSITY], 2),
                 round(td[KEY_NORMALIZED_DENSITY], 6),
-                str(round(td[KEY_AGE_0_14], 2)) + '%',
-                str(round(td[KEY_AGE_15_64], 2)) + '%',
-                str(round(td[KEY_AGE_65], 2)) + '%',
+                str(round(100.0 * td[KEY_AGE_0_14], 2)) + '%',
+                str(round(100.0 * td[KEY_AGE_15_64], 2)) + '%',
+                str(round(100.0 * td[KEY_AGE_65], 2)) + '%',
                 round(erv, 5),
                 str(round(100.0 * erv / ER_tot, 2)) + '%' if ER_tot > 0 else '0%',
                 td[KEY_LOCAL_COMMUTER_TYPE1],
@@ -3431,16 +3431,16 @@ class EpiRankMainWindow(QMainWindow):
             ('Population vs COVID-19: Spearman', get_spearman_cor(pop_rank, covid_case_rank)),
         ]
         for i, (lbl, val) in enumerate(pop_corr_data):
-            ws.cell(row=sr + i, column=8, value=lbl).font = body_font
+            ws.cell(row=sr + i, column=5, value=lbl).font = body_font
             ws.cell(row=sr + i, column=9, value=val).font = body_font
 
         # ── ER stats (cols 15-16) ──
-        ws.cell(row=sr, column=15, value='EpiRank total = ').font = body_font
-        ws.cell(row=sr, column=16, value=round(ER_tot, 5)).font = body_font
-        ws.cell(row=sr + 1, column=15, value='EpiRank mean  = ').font = body_font
-        ws.cell(row=sr + 1, column=16, value=round(ER_avg, 5)).font = body_font
-        ws.cell(row=sr + 2, column=15, value='EpiRank SD    = ').font = body_font
-        ws.cell(row=sr + 2, column=16, value=round(ER_std, 5)).font = body_font
+        ws.cell(row=sr, column=9, value='EpiRank total = ').font = body_font
+        ws.cell(row=sr, column=4, value=round(ER_tot, 5)).font = body_font
+        ws.cell(row=sr + 1, column=9, value='EpiRank mean  = ').font = body_font
+        ws.cell(row=sr + 1, column=4, value=round(ER_avg, 5)).font = body_font
+        ws.cell(row=sr + 2, column=9, value='EpiRank SD    = ').font = body_font
+        ws.cell(row=sr + 2, column=4, value=round(ER_std, 5)).font = body_font
 
         # Correlation labels
         labels = [
@@ -3519,11 +3519,11 @@ class EpiRankMainWindow(QMainWindow):
             ws2.cell(row=row_idx, column=3, value=item['Pearson_r'])
             ws2.cell(row=row_idx, column=4, value=item['Spearman_rho'])
             ws2.cell(row=row_idx, column=5, value=item['Kendall_tau'])
-            ws2.cell(row=row_idx, column=6, value=item['Pearson_partial_r'])
-            ws2.cell(row=row_idx, column=7, value=item['Spearman_partial_rho'])
-            ws2.cell(row=row_idx, column=8, value=item['Recall'])
+            ws2.cell(row=row_idx, column=9, value=item['Pearson_partial_r'])
+            ws2.cell(row=row_idx, column=4, value=item['Spearman_partial_rho'])
+            ws2.cell(row=row_idx, column=5, value=item['Recall'])
             ws2.cell(row=row_idx, column=9, value=item['Precision'])
-            ws2.cell(row=row_idx, column=10, value=item['F1'])
+            ws2.cell(row=row_idx, column=4, value=item['F1'])
 
         # 简单调整列宽
         for col in range(1, 11):
