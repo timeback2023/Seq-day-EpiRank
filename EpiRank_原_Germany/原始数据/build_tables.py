@@ -91,12 +91,15 @@ def rki_ags_to_canon(ags_str, canon_index):
 
 # ---------------------------------------------------------------- cn.xlsx
 def build_cn(canon):
-    """2024 年出行矩阵：按 (start_county, end_county) 对 age_group × activity_dest 求和。
+    """2024 年通勤矩阵：仅取 activity_dest=1（Work place，工作地点）的出行人次，
+    按 (start_county, end_county) 对 age_group 求和。
 
     原始 CSV 已经是 400 县 AGS 空间（柏林为 11000，无 16056），直接透视即可。
     """
     od = pd.read_csv(os.path.join(
         RAW, 'OD', 'trip_count_matrix_county_by_age_activity_final_2024.csv'))
+    # 仅保留通勤（Work place，activity_dest=1），排除教育/购物/休闲等其他活动
+    od = od[od['activity_dest'] == 1].copy()
     canon_index = {a: i for i, a in enumerate(canon['AGS num'])}
     si = od['start_county'].map(canon_index)
     ei = od['end_county'].map(canon_index)
@@ -107,36 +110,27 @@ def build_cn(canon):
 
 
 # ---------------------------------------------------------------- bs.xlsx
-def build_bs(canon, cn_matrix, labels):
-    """bs.xlsx：坐标来自 Merging_List，通勤四列来自 cn 矩阵，其余为占位常数。
+def build_bs(canon, cn_matrix, labels, kreise_areas):
+    """bs.xlsx：坐标来自 Merging_List，通勤四列来自 cn 矩阵，面积来自 kreise.xlsx。
 
     labels: DataFrame[county, town, population]，这三列**不在 原始数据/ 内**，
             属外部规范名表（见 数据说明.md 第 6 节），需由已有 bs.xlsx 提供。
+    kreise_areas: dict[int, float]，AGS -> 土地面积 km²，来自 kreise.xlsx。
     """
     bs = pd.DataFrame({
         'db_ID': np.arange(N_COUNTY),
         'county': labels['county'].to_numpy(),
         'town': labels['town'].to_numpy(),
-        'area': 1,
         'pos.x': canon['Lon'].to_numpy(),
         'pos.y': canon['Lat'].to_numpy(),
+        'population': labels['population'].to_numpy(),
     })
-    bs['pos2.x'] = bs['pos.x']
-    bs['pos2.y'] = bs['pos.y']
-    bs['population'] = labels['population'].to_numpy()
-    bs['sub_percentage'] = 1
-    bs['sub_area km2'] = 1
-    bs['area_km2'] = 1
-    bs['pop_den'] = bs['population']
-    bs['pop_den (normal)'] = 1
-    bs['age 0-14'] = 0.15
-    bs['age 15-64'] = 0.65
-    bs['age 65+'] = 0.2
+    bs['area_km2'] = [kreise_areas.get(int(a), 1) for a in canon['AGS num']]
+    bs['pop_den'] = bs['population'] / bs['area_km2']
     bs['local_commuter_type1'] = np.diag(cn_matrix)
     bs['out_commuter_type1'] = cn_matrix.sum(axis=1)
     bs['in_commuter_type1'] = cn_matrix.sum(axis=0)
     bs['commuter_type1'] = cn_matrix.sum(axis=1)
-    bs['railroad_zone'] = 0
     return bs
 
 
@@ -348,7 +342,14 @@ def main():
         labels = pd.read_excel(bs_path, sheet_name='Sheet1')[['county', 'town', 'population']]
     else:
         raise SystemExit('缺少 bs.xlsx：county/town/population 三列无法从 原始数据/ 推导')
-    bs = build_bs(canon, cn_matrix, labels)
+
+    # 从 kreise.xlsx 读取各县土地面积 (AGS -> 面积 km²)
+    kreise_path = os.path.join(RAW, 'kreise.xlsx')
+    kf = pd.read_excel(kreise_path, sheet_name='Kreisfreie Städte u. Landkreise', header=1)
+    kf['AGS'] = kf['Amtlicher Regionalschlüssel'].astype(str).str.strip().astype(int)
+    kreise_areas = dict(zip(kf['AGS'], kf[' Fläche km² ¹⁾']))
+
+    bs = build_bs(canon, cn_matrix, labels, kreise_areas)
 
     rebuilt = {'bs.xlsx': bs, 'cn.xlsx': cn_matrix, 'COVID-19.xlsx': covid,
                'flu.xlsx': flu, 'nv.xlsx': nv}
